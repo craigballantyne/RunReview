@@ -1,0 +1,87 @@
+import { z } from "zod";
+
+const trackPointSchema = z.object({
+  point_index: z.number().int(),
+  elapsed_sec: z.number(),
+  latitude: z.number().nullable().optional().default(null),
+  longitude: z.number().nullable().optional().default(null),
+  elevation_m: z.number().nullable().optional().default(null),
+  heart_rate: z.number().int().nullable().optional().default(null),
+  speed_mps: z.number().nullable().optional().default(null),
+});
+
+const splitSchema = z.object({
+  split_index: z.number().int(),
+  start_time_gmt: z.string(),
+  distance_m: z.number(),
+  duration_sec: z.number(),
+  avg_speed_mps: z.number().nullable().optional().default(null),
+  avg_hr: z.number().int().nullable().optional().default(null),
+  max_hr: z.number().int().nullable().optional().default(null),
+  avg_cadence_spm: z.number().nullable().optional().default(null),
+  elevation_gain_m: z.number().nullable().optional().default(null),
+  elevation_loss_m: z.number().nullable().optional().default(null),
+});
+
+const hrZoneSchema = z.object({
+  zone_number: z.number().int(),
+  zone_low_bpm: z.number().int().nullable().optional().default(null),
+  zone_high_bpm: z.number().int().nullable().optional().default(null),
+  seconds_in_zone: z.number(),
+});
+
+export const activitySchema = z
+  .object({
+    activity_id: z.union([z.number(), z.string()]),
+    activity_name: z.string(),
+    activity_type_key: z.string(),
+    start_time_gmt: z.string(),
+    start_time_local: z.string(),
+    duration_sec: z.number(),
+    moving_duration_sec: z.number(),
+    distance_m: z.number(),
+    avg_speed_mps: z.number().nullable().optional().default(null),
+    max_speed_mps: z.number().nullable().optional().default(null),
+    avg_hr: z.number().int().nullable().optional().default(null),
+    max_hr: z.number().int().nullable().optional().default(null),
+    avg_cadence_spm: z.number().nullable().optional().default(null),
+    max_cadence_spm: z.number().nullable().optional().default(null),
+    elevation_gain_m: z.number().nullable().optional().default(null),
+    elevation_loss_m: z.number().nullable().optional().default(null),
+    calories: z.number().nullable().optional().default(null),
+    start_latitude: z.number().nullable().optional().default(null),
+    start_longitude: z.number().nullable().optional().default(null),
+    splits: z.array(splitSchema).optional().default([]),
+    hr_zones: z.array(hrZoneSchema).optional().default([]),
+    track_points: z.array(trackPointSchema).optional().default([]),
+  })
+  .passthrough(); // device_name / fetched_at / updated_at / unknown fields are ignored, not errors
+
+export type ValidatedActivity = z.infer<typeof activitySchema>;
+
+export type ActivityValidationResult =
+  | { valid: true; activity: ValidatedActivity }
+  | { valid: false; reason: string; activityName: string | null; externalActivityId: string | number | null };
+
+function extractIdentityForErrorReporting(raw: unknown): { activityName: string | null; externalActivityId: string | number | null } {
+  if (typeof raw !== "object" || raw === null) {
+    return { activityName: null, externalActivityId: null };
+  }
+  const record = raw as Record<string, unknown>;
+  const activityName = typeof record.activity_name === "string" ? record.activity_name : null;
+  const externalActivityId =
+    typeof record.activity_id === "number" || typeof record.activity_id === "string" ? record.activity_id : null;
+  return { activityName, externalActivityId };
+}
+
+export function validateActivity(raw: unknown): ActivityValidationResult {
+  const result = activitySchema.safeParse(raw);
+  if (result.success) {
+    return { valid: true, activity: result.data };
+  }
+
+  const { activityName, externalActivityId } = extractIdentityForErrorReporting(raw);
+  const firstIssue = result.error.issues[0];
+  const reason = firstIssue ? `${firstIssue.path.join(".") || "activity"}: ${firstIssue.message}` : "Invalid activity";
+  return { valid: false, reason, activityName, externalActivityId };
+}

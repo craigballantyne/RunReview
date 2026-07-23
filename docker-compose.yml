@@ -1,0 +1,99 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-runreview}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-runreview}
+      POSTGRES_DB: ${POSTGRES_DB:-runreview}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-runreview}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+      target: dev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-runreview}:${POSTGRES_PASSWORD:-runreview}@postgres:5432/${POSTGRES_DB:-runreview}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/workspace
+      - api_node_modules:/workspace/node_modules
+      - import_uploads:/data/imports
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev --workspace packages/api
+
+  worker:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+      target: dev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-runreview}:${POSTGRES_PASSWORD:-runreview}@postgres:5432/${POSTGRES_DB:-runreview}
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - .:/workspace
+      - api_node_modules:/workspace/node_modules
+      - import_uploads:/data/imports
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev:worker --workspace packages/api
+
+  web:
+    build:
+      context: .
+      dockerfile: packages/web/Dockerfile
+      target: dev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Overrides .env's API_BASE_URL (which must stay a browser-resolvable http://localhost:3000
+      # for links in emails) so the Vite dev server's own /api proxy reaches the api container
+      # over the Docker network instead of its own loopback.
+      API_BASE_URL: http://api:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/workspace
+      - web_node_modules:/workspace/node_modules
+    depends_on:
+      - api
+    command: npm run dev --workspace packages/web -- --host
+
+volumes:
+  postgres_data:
+  import_uploads:
+  api_node_modules:
+  web_node_modules:

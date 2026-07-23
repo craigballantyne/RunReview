@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run prisma:generate
+      - run: npm run typecheck
+      - run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: runreview
+          POSTGRES_PASSWORD: runreview
+          POSTGRES_DB: runreview
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U runreview"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://runreview:runreview@localhost:5432/runreview
+      REDIS_URL: redis://localhost:6379
+      SESSION_COOKIE_SECRET: ci-test-secret-not-for-production
+      SESSION_COOKIE_NAME: rr_session
+      RESEND_API_KEY: re_ci_placeholder
+      EMAIL_FROM: "Run Review <noreply@runreview.app>"
+      APP_BASE_URL: http://localhost:5173
+      API_BASE_URL: http://localhost:3000
+      NOMINATIM_USER_AGENT: "RunReview/ci"
+      IMPORT_UPLOAD_DIR: /tmp/imports
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run prisma:migrate:deploy --workspace packages/api
+      - run: npm test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run prisma:generate
+      - run: npm run build
+      - name: Build api image (smoke test)
+        run: docker build -f packages/api/Dockerfile -t run-review-api:ci .
+      - name: Build web image (smoke test)
+        run: docker build -f packages/web/Dockerfile -t run-review-web:ci .

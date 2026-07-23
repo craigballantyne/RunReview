@@ -1,0 +1,1218 @@
+{
+  "exported_at": "2026-07-20T23:31:47.218730+00:00",
+  "activity_count": 1,
+  "activities": [
+    {
+      "activity_id": 7070576238,
+      "activity_name": "City of Edinburgh - Benchmark Run",
+      "activity_type_key": "running",
+      "start_time_gmt": "2021-07-04T19:25:53.0",
+      "start_time_local": "2021-07-04T20:25:53.0",
+      "duration_sec": 540.0,
+      "moving_duration_sec": 512.0,
+      "distance_m": 1508.48,
+      "avg_speed_mps": 2.7929999828338623,
+      "max_speed_mps": 4.002999782562256,
+      "avg_hr": 157,
+      "max_hr": 184,
+      "avg_cadence_spm": 130.171875,
+      "max_cadence_spm": 160.0,
+      "elevation_gain_m": 20.23,
+      "elevation_loss_m": 17.65,
+      "calories": 116.0,
+      "start_latitude": 55.95343217253685,
+      "start_longitude": -3.2437953539192677,
+      "device_name": null,
+      "fetched_at": "2026-07-20T23:10:14.852456+00:00",
+      "updated_at": "2026-07-20T23:10:14.852456+00:00",
+      "splits": [
+        {
+          "split_index": 1,
+          "start_time_gmt": "2021-07-04T19:25:53.0",
+          "distance_m": 180.93,
+          "duration_sec": 120.0,
+          "avg_speed_mps": 1.5080000162124634,
+          "avg_hr": 116,
+          "max_hr": 130,
+          "avg_cadence_spm": 103.578125,
+          "elevation_gain_m": 9.59,
+          "elevation_loss_m": 0.0
+        },
+        {
+          "split_index": 2,
+          "start_time_gmt": "2021-07-04T19:27:53.0",
+          "distance_m": 1098.36,
+          "duration_sec": 300.0,
+          "avg_speed_mps": 3.661000013351441,
+          "avg_hr": 169,
+          "max_hr": 184,
+          "avg_cadence_spm": 153.046875,
+          "elevation_gain_m": 5.86,
+          "elevation_loss_m": 13.71
+        },
+        {
+          "split_index": 3,
+          "start_time_gmt": "2021-07-04T19:32:53.0",
+          "distance_m": 229.18,
+          "duration_sec": 120.0,
+          "avg_speed_mps": 1.909999966621399,
+          "avg_hr": 168,
+          "max_hr": 179,
+          "avg_cadence_spm": 99.53125,
+          "elevation_gain_m": 5.34,
+          "elevation_loss_m": 3.94
+        }
+      ],
+      "hr_zones": [
+        {
+          "zone_number": 1,
+          "zone_low_bpm": 92,
+          "zone_high_bpm": null,
+          "seconds_in_zone": 20.998
+        },
+        {
+          "zone_number": 2,
+          "zone_low_bpm": 110,
+          "zone_high_bpm": null,
+          "seconds_in_zone": 90.128
+        },
+        {
+          "zone_number": 3,
+          "zone_low_bpm": 128,
+          "zone_high_bpm": null,
+          "seconds_in_zone": 23.124
+        },
+        {
+          "zone_number": 4,
+          "zone_low_bpm": 146,
+          "zone_high_bpm": null,
+          "seconds_in_zone": 142.001
+        },
+        {
+          "zone_number": 5,
+          "zone_low_bpm": 165,
+          "zone_high_bpm": null,
+          "seconds_in_zone": 261.121
+        }
+      ],
+      "track_points": [
+        {
+          "point_index": 0,
+          "elapsed_sec": 0.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 59.599998474121094,
+          "heart_rate": 110,
+          "speed_mps": 0.0
+        },
+        {
+          "point_index": 1,
+          "elapsed_sec": 1.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 59.599998474121094,
+          "heart_rate": 100,
+          "speed_mps": 1.6330000162124634
+        },
+        {
+          "point_index": 2,
+          "elapsed_sec": 6.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 60.20000076293945,
+          "heart_rate": 103,
+          "speed_mps": 1.5859999656677246
+        },
+        {
+          "point_index": 3,
+          "elapsed_sec": 8.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 60.20000076293945,
+          "heart_rate": 106,
+          "speed_mps": 1.6799999475479126
+        },
+        {
+          "point_index": 4,
+          "elapsed_sec": 11.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 61.0,
+          "heart_rate": 109,
+          "speed_mps": 1.8849999904632568
+        },
+        {
+          "point_index": 5,
+          "elapsed_sec": 14.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 61.0,
+          "heart_rate": 112,
+          "speed_mps": 1.8660000562667847
+        },
+        {
+          "point_index": 6,
+          "elapsed_sec": 20.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 61.400001525878906,
+          "heart_rate": 115,
+          "speed_mps": 1.7259999513626099
+        },
+        {
+          "point_index": 7,
+          "elapsed_sec": 22.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 62.0,
+          "heart_rate": 118,
+          "speed_mps": 0.0
+        },
+        {
+          "point_index": 8,
+          "elapsed_sec": 23.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 62.0,
+          "heart_rate": 120,
+          "speed_mps": 0.0
+        },
+        {
+          "point_index": 9,
+          "elapsed_sec": 26.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 62.599998474121094,
+          "heart_rate": 123,
+          "speed_mps": 0.0
+        },
+        {
+          "point_index": 10,
+          "elapsed_sec": 30.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 62.599998474121094,
+          "heart_rate": 120,
+          "speed_mps": 1.875
+        },
+        {
+          "point_index": 11,
+          "elapsed_sec": 32.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 62.79999923706055,
+          "heart_rate": 117,
+          "speed_mps": 1.930999994277954
+        },
+        {
+          "point_index": 12,
+          "elapsed_sec": 34.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 62.79999923706055,
+          "heart_rate": 113,
+          "speed_mps": 1.9220000505447388
+        },
+        {
+          "point_index": 13,
+          "elapsed_sec": 37.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 63.0,
+          "heart_rate": 110,
+          "speed_mps": 1.8660000562667847
+        },
+        {
+          "point_index": 14,
+          "elapsed_sec": 39.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 63.20000076293945,
+          "heart_rate": 110,
+          "speed_mps": 1.8569999933242798
+        },
+        {
+          "point_index": 15,
+          "elapsed_sec": 44.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 63.20000076293945,
+          "heart_rate": 112,
+          "speed_mps": 1.8380000591278076
+        },
+        {
+          "point_index": 16,
+          "elapsed_sec": 45.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 63.20000076293945,
+          "heart_rate": 109,
+          "speed_mps": 1.8289999961853027
+        },
+        {
+          "point_index": 17,
+          "elapsed_sec": 56.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 64.19999694824219,
+          "heart_rate": 113,
+          "speed_mps": 1.847000002861023
+        },
+        {
+          "point_index": 18,
+          "elapsed_sec": 60.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 64.5999984741211,
+          "heart_rate": 116,
+          "speed_mps": 1.8849999904632568
+        },
+        {
+          "point_index": 19,
+          "elapsed_sec": 68.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 65.4000015258789,
+          "heart_rate": 116,
+          "speed_mps": 1.8009999990463257
+        },
+        {
+          "point_index": 20,
+          "elapsed_sec": 70.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 65.4000015258789,
+          "heart_rate": 113,
+          "speed_mps": 1.781999945640564
+        },
+        {
+          "point_index": 21,
+          "elapsed_sec": 71.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 65.5999984741211,
+          "heart_rate": 117,
+          "speed_mps": 1.8009999990463257
+        },
+        {
+          "point_index": 22,
+          "elapsed_sec": 77.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 66.4000015258789,
+          "heart_rate": 119,
+          "speed_mps": 1.7730000019073486
+        },
+        {
+          "point_index": 23,
+          "elapsed_sec": 92.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 67.4000015258789,
+          "heart_rate": 118,
+          "speed_mps": 0.0
+        },
+        {
+          "point_index": 24,
+          "elapsed_sec": 93.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 67.80000305175781,
+          "heart_rate": 118,
+          "speed_mps": 0.0
+        },
+        {
+          "point_index": 25,
+          "elapsed_sec": 103.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.5999984741211,
+          "heart_rate": 121,
+          "speed_mps": 1.809999942779541
+        },
+        {
+          "point_index": 26,
+          "elapsed_sec": 106.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.80000305175781,
+          "heart_rate": 124,
+          "speed_mps": 1.753999948501587
+        },
+        {
+          "point_index": 27,
+          "elapsed_sec": 110.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.0,
+          "heart_rate": 127,
+          "speed_mps": 1.7640000581741333
+        },
+        {
+          "point_index": 28,
+          "elapsed_sec": 116.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.80000305175781,
+          "heart_rate": 130,
+          "speed_mps": 1.781999945640564
+        },
+        {
+          "point_index": 29,
+          "elapsed_sec": 120.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.80000305175781,
+          "heart_rate": 129,
+          "speed_mps": 1.8569999933242798
+        },
+        {
+          "point_index": 30,
+          "elapsed_sec": 126.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.0,
+          "heart_rate": 132,
+          "speed_mps": 0.0
+        },
+        {
+          "point_index": 31,
+          "elapsed_sec": 129.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.4000015258789,
+          "heart_rate": 135,
+          "speed_mps": 3.6389999389648438
+        },
+        {
+          "point_index": 32,
+          "elapsed_sec": 131.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.19999694824219,
+          "heart_rate": 139,
+          "speed_mps": 3.630000114440918
+        },
+        {
+          "point_index": 33,
+          "elapsed_sec": 132.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.0,
+          "heart_rate": 142,
+          "speed_mps": 3.7139999866485596
+        },
+        {
+          "point_index": 34,
+          "elapsed_sec": 134.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.0,
+          "heart_rate": 144,
+          "speed_mps": 3.7880001068115234
+        },
+        {
+          "point_index": 35,
+          "elapsed_sec": 137.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.0,
+          "heart_rate": 147,
+          "speed_mps": 3.7790000438690186
+        },
+        {
+          "point_index": 36,
+          "elapsed_sec": 142.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.19999694824219,
+          "heart_rate": 151,
+          "speed_mps": 3.7790000438690186
+        },
+        {
+          "point_index": 37,
+          "elapsed_sec": 148.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.19999694824219,
+          "heart_rate": 148,
+          "speed_mps": 3.881999969482422
+        },
+        {
+          "point_index": 38,
+          "elapsed_sec": 154.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.5999984741211,
+          "heart_rate": 151,
+          "speed_mps": 3.8440001010894775
+        },
+        {
+          "point_index": 39,
+          "elapsed_sec": 157.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.4000015258789,
+          "heart_rate": 154,
+          "speed_mps": 3.742000102996826
+        },
+        {
+          "point_index": 40,
+          "elapsed_sec": 163.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.80000305175781,
+          "heart_rate": 157,
+          "speed_mps": 3.7320001125335693
+        },
+        {
+          "point_index": 41,
+          "elapsed_sec": 169.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.4000015258789,
+          "heart_rate": 154,
+          "speed_mps": 3.871999979019165
+        },
+        {
+          "point_index": 42,
+          "elapsed_sec": 172.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.4000015258789,
+          "heart_rate": 155,
+          "speed_mps": 3.7980000972747803
+        },
+        {
+          "point_index": 43,
+          "elapsed_sec": 177.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.4000015258789,
+          "heart_rate": 158,
+          "speed_mps": 3.9000000953674316
+        },
+        {
+          "point_index": 44,
+          "elapsed_sec": 182.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.0,
+          "heart_rate": 161,
+          "speed_mps": 3.947000026702881
+        },
+        {
+          "point_index": 45,
+          "elapsed_sec": 186.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.4000015258789,
+          "heart_rate": 164,
+          "speed_mps": 3.9560000896453857
+        },
+        {
+          "point_index": 46,
+          "elapsed_sec": 190.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 70.0,
+          "heart_rate": 166,
+          "speed_mps": 3.9560000896453857
+        },
+        {
+          "point_index": 47,
+          "elapsed_sec": 194.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 70.0,
+          "heart_rate": 166,
+          "speed_mps": 3.8540000915527344
+        },
+        {
+          "point_index": 48,
+          "elapsed_sec": 200.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 70.80000305175781,
+          "heart_rate": 168,
+          "speed_mps": 3.947000026702881
+        },
+        {
+          "point_index": 49,
+          "elapsed_sec": 201.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 71.19999694824219,
+          "heart_rate": 168,
+          "speed_mps": 3.8910000324249268
+        },
+        {
+          "point_index": 50,
+          "elapsed_sec": 204.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 71.5999984741211,
+          "heart_rate": 165,
+          "speed_mps": 3.881999969482422
+        },
+        {
+          "point_index": 51,
+          "elapsed_sec": 210.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 72.19999694824219,
+          "heart_rate": 167,
+          "speed_mps": 3.881999969482422
+        },
+        {
+          "point_index": 52,
+          "elapsed_sec": 214.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 72.5999984741211,
+          "heart_rate": 170,
+          "speed_mps": 3.8440001010894775
+        },
+        {
+          "point_index": 53,
+          "elapsed_sec": 218.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 72.5999984741211,
+          "heart_rate": 173,
+          "speed_mps": 3.7230000495910645
+        },
+        {
+          "point_index": 54,
+          "elapsed_sec": 220.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 72.5999984741211,
+          "heart_rate": 174,
+          "speed_mps": 3.7139999866485596
+        },
+        {
+          "point_index": 55,
+          "elapsed_sec": 225.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.5999984741211,
+          "heart_rate": 175,
+          "speed_mps": 3.742000102996826
+        },
+        {
+          "point_index": 56,
+          "elapsed_sec": 231.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.4000015258789,
+          "heart_rate": 174,
+          "speed_mps": 3.871999979019165
+        },
+        {
+          "point_index": 57,
+          "elapsed_sec": 236.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.19999694824219,
+          "heart_rate": 171,
+          "speed_mps": 3.806999921798706
+        },
+        {
+          "point_index": 58,
+          "elapsed_sec": 242.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.19999694824219,
+          "heart_rate": 169,
+          "speed_mps": 3.947000026702881
+        },
+        {
+          "point_index": 59,
+          "elapsed_sec": 247.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.4000015258789,
+          "heart_rate": 166,
+          "speed_mps": 4.002999782562256
+        },
+        {
+          "point_index": 60,
+          "elapsed_sec": 252.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.5999984741211,
+          "heart_rate": 163,
+          "speed_mps": 3.8259999752044678
+        },
+        {
+          "point_index": 61,
+          "elapsed_sec": 258.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.4000015258789,
+          "heart_rate": 160,
+          "speed_mps": 3.7980000972747803
+        },
+        {
+          "point_index": 62,
+          "elapsed_sec": 264.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.5999984741211,
+          "heart_rate": 159,
+          "speed_mps": 3.7880001068115234
+        },
+        {
+          "point_index": 63,
+          "elapsed_sec": 270.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.5999984741211,
+          "heart_rate": 159,
+          "speed_mps": 3.8259999752044678
+        },
+        {
+          "point_index": 64,
+          "elapsed_sec": 276.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.80000305175781,
+          "heart_rate": 160,
+          "speed_mps": 3.806999921798706
+        },
+        {
+          "point_index": 65,
+          "elapsed_sec": 282.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.4000015258789,
+          "heart_rate": 161,
+          "speed_mps": 3.7230000495910645
+        },
+        {
+          "point_index": 66,
+          "elapsed_sec": 284.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.4000015258789,
+          "heart_rate": 162,
+          "speed_mps": 3.7980000972747803
+        },
+        {
+          "point_index": 67,
+          "elapsed_sec": 285.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.4000015258789,
+          "heart_rate": 165,
+          "speed_mps": 3.7980000972747803
+        },
+        {
+          "point_index": 68,
+          "elapsed_sec": 287.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.4000015258789,
+          "heart_rate": 169,
+          "speed_mps": 3.806999921798706
+        },
+        {
+          "point_index": 69,
+          "elapsed_sec": 289.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.5999984741211,
+          "heart_rate": 172,
+          "speed_mps": 3.7980000972747803
+        },
+        {
+          "point_index": 70,
+          "elapsed_sec": 295.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.80000305175781,
+          "heart_rate": 175,
+          "speed_mps": 3.7980000972747803
+        },
+        {
+          "point_index": 71,
+          "elapsed_sec": 301.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.80000305175781,
+          "heart_rate": 176,
+          "speed_mps": 3.7139999866485596
+        },
+        {
+          "point_index": 72,
+          "elapsed_sec": 307.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.80000305175781,
+          "heart_rate": 177,
+          "speed_mps": 3.7880001068115234
+        },
+        {
+          "point_index": 73,
+          "elapsed_sec": 313.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.19999694824219,
+          "heart_rate": 175,
+          "speed_mps": 3.7139999866485596
+        },
+        {
+          "point_index": 74,
+          "elapsed_sec": 314.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.19999694824219,
+          "heart_rate": 175,
+          "speed_mps": 3.694999933242798
+        },
+        {
+          "point_index": 75,
+          "elapsed_sec": 319.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.19999694824219,
+          "heart_rate": 178,
+          "speed_mps": 3.7320001125335693
+        },
+        {
+          "point_index": 76,
+          "elapsed_sec": 325.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.19999694824219,
+          "heart_rate": 181,
+          "speed_mps": 3.7790000438690186
+        },
+        {
+          "point_index": 77,
+          "elapsed_sec": 330.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.4000015258789,
+          "heart_rate": 184,
+          "speed_mps": 3.7039999961853027
+        },
+        {
+          "point_index": 78,
+          "elapsed_sec": 331.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.5999984741211,
+          "heart_rate": 184,
+          "speed_mps": 3.7230000495910645
+        },
+        {
+          "point_index": 79,
+          "elapsed_sec": 337.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.80000305175781,
+          "heart_rate": 184,
+          "speed_mps": 3.7320001125335693
+        },
+        {
+          "point_index": 80,
+          "elapsed_sec": 343.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.80000305175781,
+          "heart_rate": 184,
+          "speed_mps": 3.759999990463257
+        },
+        {
+          "point_index": 81,
+          "elapsed_sec": 344.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.80000305175781,
+          "heart_rate": 184,
+          "speed_mps": 3.7790000438690186
+        },
+        {
+          "point_index": 82,
+          "elapsed_sec": 350.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.4000015258789,
+          "heart_rate": 184,
+          "speed_mps": 3.5269999504089355
+        },
+        {
+          "point_index": 83,
+          "elapsed_sec": 356.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 74.19999694824219,
+          "heart_rate": 184,
+          "speed_mps": 3.619999885559082
+        },
+        {
+          "point_index": 84,
+          "elapsed_sec": 358.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 73.5999984741211,
+          "heart_rate": 183,
+          "speed_mps": 3.6019999980926514
+        },
+        {
+          "point_index": 85,
+          "elapsed_sec": 362.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 72.19999694824219,
+          "heart_rate": 182,
+          "speed_mps": 3.619999885559082
+        },
+        {
+          "point_index": 86,
+          "elapsed_sec": 368.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 71.4000015258789,
+          "heart_rate": 182,
+          "speed_mps": 3.5739998817443848
+        },
+        {
+          "point_index": 87,
+          "elapsed_sec": 370.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 71.0,
+          "heart_rate": 182,
+          "speed_mps": 3.368000030517578
+        },
+        {
+          "point_index": 88,
+          "elapsed_sec": 373.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.80000305175781,
+          "heart_rate": 182,
+          "speed_mps": 3.6019999980926514
+        },
+        {
+          "point_index": 89,
+          "elapsed_sec": 376.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 69.80000305175781,
+          "heart_rate": 182,
+          "speed_mps": 3.619999885559082
+        },
+        {
+          "point_index": 90,
+          "elapsed_sec": 381.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 68.4000015258789,
+          "heart_rate": 180,
+          "speed_mps": 3.5179998874664307
+        },
+        {
+          "point_index": 91,
+          "elapsed_sec": 385.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 67.19999694824219,
+          "heart_rate": 180,
+          "speed_mps": 3.6110000610351562
+        },
+        {
+          "point_index": 92,
+          "elapsed_sec": 391.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 66.19999694824219,
+          "heart_rate": 180,
+          "speed_mps": 3.6760001182556152
+        },
+        {
+          "point_index": 93,
+          "elapsed_sec": 393.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 66.0,
+          "heart_rate": 180,
+          "speed_mps": 3.630000114440918
+        },
+        {
+          "point_index": 94,
+          "elapsed_sec": 395.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 65.0,
+          "heart_rate": 180,
+          "speed_mps": 3.6670000553131104
+        },
+        {
+          "point_index": 95,
+          "elapsed_sec": 401.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 63.20000076293945,
+          "heart_rate": 181,
+          "speed_mps": 3.742000102996826
+        },
+        {
+          "point_index": 96,
+          "elapsed_sec": 407.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 62.20000076293945,
+          "heart_rate": 180,
+          "speed_mps": 3.7320001125335693
+        },
+        {
+          "point_index": 97,
+          "elapsed_sec": 408.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 61.79999923706055,
+          "heart_rate": 181,
+          "speed_mps": 3.7139999866485596
+        },
+        {
+          "point_index": 98,
+          "elapsed_sec": 414.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 60.79999923706055,
+          "heart_rate": 180,
+          "speed_mps": 3.1630001068115234
+        },
+        {
+          "point_index": 99,
+          "elapsed_sec": 416.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 60.79999923706055,
+          "heart_rate": 180,
+          "speed_mps": 3.3959999084472656
+        },
+        {
+          "point_index": 100,
+          "elapsed_sec": 420.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 60.20000076293945,
+          "heart_rate": 179,
+          "speed_mps": 3.619999885559082
+        },
+        {
+          "point_index": 101,
+          "elapsed_sec": 427.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 60.0,
+          "heart_rate": 179,
+          "speed_mps": 2.0989999771118164
+        },
+        {
+          "point_index": 102,
+          "elapsed_sec": 433.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 59.79999923706055,
+          "heart_rate": 177,
+          "speed_mps": 1.7170000076293945
+        },
+        {
+          "point_index": 103,
+          "elapsed_sec": 442.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 58.599998474121094,
+          "heart_rate": 176,
+          "speed_mps": 1.6979999542236328
+        },
+        {
+          "point_index": 104,
+          "elapsed_sec": 447.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 58.599998474121094,
+          "heart_rate": 173,
+          "speed_mps": 1.6890000104904175
+        },
+        {
+          "point_index": 105,
+          "elapsed_sec": 454.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 57.599998474121094,
+          "heart_rate": 170,
+          "speed_mps": 1.6799999475479126
+        },
+        {
+          "point_index": 106,
+          "elapsed_sec": 458.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 57.599998474121094,
+          "heart_rate": 168,
+          "speed_mps": 1.6799999475479126
+        },
+        {
+          "point_index": 107,
+          "elapsed_sec": 463.0,
+          "latitude": null,
+          "longitude": null,
+          "elevation_m": 57.599998474121094,
+          "heart_rate": 167,
+          "speed_mps": 1.6799999475479126
+        },
+        {
+          "point_index": 108,
+          "elapsed_sec": 468.0,
+          "latitude": 55.95344055444002,
+          "longitude": -3.243786133825779,
+          "elevation_m": 57.599998474121094,
+          "heart_rate": 167,
+          "speed_mps": 1.7259999513626099
+        },
+        {
+          "point_index": 109,
+          "elapsed_sec": 474.0,
+          "latitude": 55.95354692079127,
+          "longitude": -3.2436372712254524,
+          "elevation_m": 58.0,
+          "heart_rate": 166,
+          "speed_mps": 1.819000005722046
+        },
+        {
+          "point_index": 110,
+          "elapsed_sec": 484.0,
+          "latitude": 55.953674241900444,
+          "longitude": -3.2435159850865602,
+          "elevation_m": 58.20000076293945,
+          "heart_rate": 165,
+          "speed_mps": 1.7730000019073486
+        },
+        {
+          "point_index": 111,
+          "elapsed_sec": 492.0,
+          "latitude": 55.95381899736822,
+          "longitude": -3.243413306772709,
+          "elevation_m": 58.20000076293945,
+          "heart_rate": 162,
+          "speed_mps": 1.7730000019073486
+        },
+        {
+          "point_index": 112,
+          "elapsed_sec": 495.0,
+          "latitude": 55.95386166125536,
+          "longitude": -3.2433786895126104,
+          "elevation_m": 58.20000076293945,
+          "heart_rate": 162,
+          "speed_mps": 1.7640000581741333
+        },
+        {
+          "point_index": 113,
+          "elapsed_sec": 499.0,
+          "latitude": 55.95392603427172,
+          "longitude": -3.2433641888201237,
+          "elevation_m": 58.599998474121094,
+          "heart_rate": 163,
+          "speed_mps": 1.753999948501587
+        },
+        {
+          "point_index": 114,
+          "elapsed_sec": 504.0,
+          "latitude": 55.95402100123465,
+          "longitude": -3.2433442398905754,
+          "elevation_m": 59.20000076293945,
+          "heart_rate": 164,
+          "speed_mps": 1.8660000562667847
+        },
+        {
+          "point_index": 115,
+          "elapsed_sec": 507.0,
+          "latitude": 55.9540805965662,
+          "longitude": -3.243331164121628,
+          "elevation_m": 59.79999923706055,
+          "heart_rate": 164,
+          "speed_mps": 1.9869999885559082
+        },
+        {
+          "point_index": 116,
+          "elapsed_sec": 515.0,
+          "latitude": 55.954230716452,
+          "longitude": -3.2433530408889055,
+          "elevation_m": 60.79999923706055,
+          "heart_rate": 163,
+          "speed_mps": 2.1740000247955322
+        },
+        {
+          "point_index": 117,
+          "elapsed_sec": 516.0,
+          "latitude": 55.95424806699157,
+          "longitude": -3.2433610036969185,
+          "elevation_m": 61.0,
+          "heart_rate": 163,
+          "speed_mps": 2.183000087738037
+        },
+        {
+          "point_index": 118,
+          "elapsed_sec": 523.0,
+          "latitude": 55.95435124821961,
+          "longitude": -3.243443565443158,
+          "elevation_m": 61.79999923706055,
+          "heart_rate": 164,
+          "speed_mps": 2.193000078201294
+        },
+        {
+          "point_index": 119,
+          "elapsed_sec": 525.0,
+          "latitude": 55.95438200980425,
+          "longitude": -3.243457479402423,
+          "elevation_m": 62.20000076293945,
+          "heart_rate": 164,
+          "speed_mps": 2.183000087738037
+        },
+        {
+          "point_index": 120,
+          "elapsed_sec": 531.0,
+          "latitude": 55.95447110943496,
+          "longitude": -3.2435305695980787,
+          "elevation_m": 63.0,
+          "heart_rate": 165,
+          "speed_mps": 2.118000030517578
+        },
+        {
+          "point_index": 121,
+          "elapsed_sec": 532.0,
+          "latitude": 55.95448510721326,
+          "longitude": -3.243548423051834,
+          "elevation_m": 63.599998474121094,
+          "heart_rate": 164,
+          "speed_mps": 2.1089999675750732
+        },
+        {
+          "point_index": 122,
+          "elapsed_sec": 539.0,
+          "latitude": 55.954558700323105,
+          "longitude": -3.2436899095773697,
+          "elevation_m": 64.0,
+          "heart_rate": 164,
+          "speed_mps": 2.062000036239624
+        },
+        {
+          "point_index": 123,
+          "elapsed_sec": 543.0,
+          "latitude": 55.9545935690403,
+          "longitude": -3.243783116340637,
+          "elevation_m": 63.79999923706055,
+          "heart_rate": 164,
+          "speed_mps": 2.0250000953674316
+        }
+      ]
+    }
+  ]
+}
