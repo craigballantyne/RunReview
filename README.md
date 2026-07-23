@@ -38,6 +38,7 @@ npm run build        # production builds
 
 ## Notes
 
+- **`.env.example` is committed to git and its values (including `POSTGRES_PASSWORD`) are local-dev-only placeholders.** Any shared or production environment must set its own strong, unique secrets in its real `.env` — never reuse these values, and don't rely on `docker-compose.yml`'s `:-runreview` fallback defaults outside local dev.
 - `RESEND_API_KEY` needs a real key for verification/reset emails to actually send; without one, signup/reset will fail at the email-send step.
 - `NOMINATIM_USER_AGENT` must be a descriptive string with contact info per Nominatim's usage policy, or reverse geocoding during import will be rejected.
 - Import files are capped at 256MB and processed in the background — poll `GET /api/import/:jobId` (the frontend does this for you) for progress.
