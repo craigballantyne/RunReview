@@ -55,12 +55,22 @@ export function createAuthService({ prisma, mailer, config, logger = console }: 
 
       const passwordHash = await hashPassword(password);
       const user = await prisma.$transaction(async (tx) => {
-        const created = await tx.user.create({ data: { email, passwordHash } });
+        const created = await tx.user.create({
+          data: {
+            email,
+            passwordHash,
+            // With verification disabled (dev/test convenience), skip the email loop entirely
+            // and mark the account verified at creation so it behaves as if the link was clicked.
+            emailVerifiedAt: config.FEATURE_EMAIL_VERIFICATION ? null : new Date(),
+          },
+        });
         await recordAuditLog(tx, { userId: created.id, userEmail: created.email, action: "ACCOUNT_CREATED" });
         return created;
       });
 
-      await sendVerificationEmail(user.id, user.email);
+      if (config.FEATURE_EMAIL_VERIFICATION) {
+        await sendVerificationEmail(user.id, user.email);
+      }
 
       return user;
     },

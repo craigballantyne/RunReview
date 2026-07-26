@@ -7,15 +7,8 @@ import { ActivityPage } from "./routes/ActivityPage.js";
 import { AccountPage } from "./routes/AccountPage.js";
 import { ResetPasswordPage } from "./routes/ResetPasswordPage.js";
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth();
-  if (isLoading) return null;
-  if (!user) return <Navigate to="/" replace />;
-  return <>{children}</>;
-}
-
-/** Same as ProtectedRoute, but also requires a verified account — redirects to "/" otherwise,
- * where LandingPage shows the appropriate unverified/logged-out state. */
+/** Requires a logged-in, verified account — redirects to "/" otherwise, where LandingPage
+ * shows the appropriate unverified/logged-out state. */
 function VerifiedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   if (isLoading) return null;
@@ -50,9 +43,9 @@ export function App() {
           <Route
             path="/account"
             element={
-              <ProtectedRoute>
+              <VerifiedRoute>
                 <AccountPage />
-              </ProtectedRoute>
+              </VerifiedRoute>
             }
           />
         </Routes>

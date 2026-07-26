@@ -14,6 +14,12 @@ const envSchema = z.object({
   IMPORT_UPLOAD_DIR: z.string().min(1),
   IMPORT_MAX_FILE_SIZE_BYTES: z.coerce.number().int().positive().default(268_435_456),
   PORT: z.coerce.number().int().positive().default(3000),
+  // z.coerce.boolean() is a footgun here: Boolean("false") is true, so any non-empty
+  // string (including the literal "false") would coerce to true. Compare explicitly instead.
+  FEATURE_EMAIL_VERIFICATION: z
+    .string()
+    .default("true")
+    .transform((val) => val !== "false"),
 });
 
 export type Env = z.infer<typeof envSchema>;

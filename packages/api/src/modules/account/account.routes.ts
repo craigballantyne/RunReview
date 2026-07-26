@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { createMailer } from "../../lib/email.js";
-import { requireAuth } from "../../middleware/require-auth.js";
+import { requireVerified } from "../../middleware/require-verified.js";
 import { changePasswordSchema, deleteAccountSchema } from "../auth/auth.schemas.js";
 import { createAuthService } from "../auth/auth.service.js";
 import { createAccountService } from "./account.service.js";
@@ -10,7 +10,7 @@ export async function accountRoutes(fastify: FastifyInstance): Promise<void> {
   const authService = createAuthService({ prisma: fastify.prisma, mailer, config: fastify.config, logger: fastify.log });
   const accountService = createAccountService({ prisma: fastify.prisma });
 
-  fastify.addHook("preHandler", requireAuth);
+  fastify.addHook("preHandler", requireVerified);
 
   fastify.get("/summary", async (req, reply) => {
     const summary = await accountService.getSummary(req.user!.id);
