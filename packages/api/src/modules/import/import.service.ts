@@ -3,6 +3,7 @@ import type { SkippedActivityDetail } from "@run-review/shared";
 import { isRunningActivityType } from "@run-review/shared";
 import { recordAuditLog } from "../audit/audit.service.js";
 import type { Geocoder } from "./geocode.js";
+import type { HealthMetricsService } from "./health-metrics.service.js";
 import { peekActivityCount, streamActivities } from "./streaming-parser.js";
 import { validateActivity, type ValidatedActivity } from "./validation.js";
 
@@ -11,6 +12,7 @@ const PROGRESS_FLUSH_INTERVAL = 25;
 export interface ImportServiceDeps {
   prisma: PrismaClient;
   geocoder: Geocoder;
+  healthMetrics: HealthMetricsService;
 }
 
 /**
@@ -88,7 +90,7 @@ export function mapActivityToRunCreateInput(
   };
 }
 
-export function createImportService({ prisma, geocoder }: ImportServiceDeps) {
+export function createImportService({ prisma, geocoder, healthMetrics }: ImportServiceDeps) {
   async function insertRun(userId: string, activity: ValidatedActivity, externalActivityId: bigint) {
     let location: string | null = null;
     if (activity.start_latitude != null && activity.start_longitude != null) {
@@ -140,6 +142,13 @@ export function createImportService({ prisma, geocoder }: ImportServiceDeps) {
             });
           } else {
             const activity = validation.activity;
+
+            // Sleep/body_battery are full-day health metrics, not run-specific — extracted from
+            // every activity regardless of running-type filtering or Run dedup below, so a rest
+            // day whose only logged activity is a walk doesn't silently lose its health data.
+            await healthMetrics.upsertSleep(job.userId, activity.sleep);
+            await healthMetrics.upsertBodyBattery(job.userId, activity.body_battery);
+
             if (!isRunningActivityType(activity.activity_type_key)) {
               skipped++;
               skippedDetails.push({

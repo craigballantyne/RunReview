@@ -30,6 +30,42 @@ const hrZoneSchema = z.object({
   seconds_in_zone: z.number(),
 });
 
+// Unlike the activity's own start_time_gmt/start_time_local (ISO strings), sleep's timestamps
+// are epoch-ms numbers.
+const sleepSchema = z.object({
+  sleep_time_sec: z.number().int().nullable().optional().default(null),
+  nap_time_sec: z.number().int().nullable().optional().default(null),
+  deep_sleep_sec: z.number().int().nullable().optional().default(null),
+  light_sleep_sec: z.number().int().nullable().optional().default(null),
+  rem_sleep_sec: z.number().int().nullable().optional().default(null),
+  awake_sleep_sec: z.number().int().nullable().optional().default(null),
+  sleep_start_gmt: z.number(),
+  sleep_end_gmt: z.number(),
+  sleep_start_local: z.number(),
+  sleep_end_local: z.number(),
+  sleep_score: z.number().int().nullable().optional().default(null),
+  sleep_score_qualifier: z.string().nullable().optional().default(null),
+});
+
+// Readings use epoch-ms timestamps (like sleep), while the parent window uses ISO strings
+// (like the activity's own start_time_gmt/start_time_local) — an intentional asymmetry in the
+// source data, not a typo.
+const bodyBatteryReadingSchema = z.object({
+  reading_index: z.number().int(),
+  timestamp_gmt: z.number(),
+  battery_level: z.number().int(),
+});
+
+const bodyBatterySchema = z.object({
+  charged: z.number().int().nullable().optional().default(null),
+  drained: z.number().int().nullable().optional().default(null),
+  start_timestamp_gmt: z.string(),
+  end_timestamp_gmt: z.string(),
+  start_timestamp_local: z.string(),
+  end_timestamp_local: z.string(),
+  readings: z.array(bodyBatteryReadingSchema).optional().default([]),
+});
+
 export const activitySchema = z
   .object({
     activity_id: z.union([z.number(), z.string()]),
@@ -54,6 +90,8 @@ export const activitySchema = z
     splits: z.array(splitSchema).optional().default([]),
     hr_zones: z.array(hrZoneSchema).optional().default([]),
     track_points: z.array(trackPointSchema).optional().default([]),
+    sleep: sleepSchema.nullable().optional().default(null),
+    body_battery: bodyBatterySchema.nullable().optional().default(null),
   })
   .passthrough(); // device_name / fetched_at / updated_at / unknown fields are ignored, not errors
 

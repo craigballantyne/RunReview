@@ -81,4 +81,67 @@ describe("validateActivity", () => {
       expect(result.externalActivityId).toBeNull();
     }
   });
+
+  const baseActivity = {
+    activity_id: 1,
+    activity_name: "Health metrics",
+    activity_type_key: "running",
+    start_time_gmt: "2022-01-01T00:00:00.0",
+    start_time_local: "2022-01-01T00:00:00.0",
+    duration_sec: 100,
+    moving_duration_sec: 90,
+    distance_m: 1000,
+  };
+
+  it("accepts an activity with sleep and body_battery present, parsing their distinct timestamp formats", () => {
+    const result = validateActivity({
+      ...baseActivity,
+      sleep: {
+        sleep_time_sec: 27840,
+        nap_time_sec: 0,
+        deep_sleep_sec: 3840,
+        light_sleep_sec: 18360,
+        rem_sleep_sec: 5640,
+        awake_sleep_sec: 420,
+        sleep_start_gmt: 1784611260000,
+        sleep_end_gmt: 1784639520000,
+        sleep_start_local: 1784614860000,
+        sleep_end_local: 1784643120000,
+        sleep_score: 89,
+        sleep_score_qualifier: "GOOD",
+      },
+      body_battery: {
+        charged: 67,
+        drained: 67,
+        start_timestamp_gmt: "2026-07-20T23:00:00.0",
+        end_timestamp_gmt: "2026-07-21T23:00:00.0",
+        start_timestamp_local: "2026-07-21T00:00:00.0",
+        end_timestamp_local: "2026-07-22T00:00:00.0",
+        readings: [{ reading_index: 0, timestamp_gmt: 1784610900000, battery_level: 33 }],
+      },
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.activity.sleep?.sleep_score).toBe(89);
+      expect(result.activity.body_battery?.readings).toHaveLength(1);
+      expect(result.activity.body_battery?.readings[0]?.battery_level).toBe(33);
+    }
+  });
+
+  it("accepts an activity with sleep and body_battery absent, defaulting both to null", () => {
+    const result = validateActivity(baseActivity);
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.activity.sleep).toBeNull();
+      expect(result.activity.body_battery).toBeNull();
+    }
+  });
+
+  it("rejects an activity with a malformed sleep block", () => {
+    const result = validateActivity({
+      ...baseActivity,
+      sleep: { sleep_start_gmt: "not-a-number" },
+    });
+    expect(result.valid).toBe(false);
+  });
 });

@@ -38,11 +38,13 @@ model User {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
-  sessions   Session[]
-  authTokens AuthToken[]
-  runs       Run[]
-  importJobs ImportJob[]
-  auditLogs  AuditLog[]
+  sessions      Session[]
+  authTokens    AuthToken[]
+  runs          Run[]
+  importJobs    ImportJob[]
+  auditLogs     AuditLog[]
+  sleeps        Sleep[]
+  bodyBatteries BodyBattery[]
 
   @@map("users")
 }
@@ -162,6 +164,64 @@ model TrackPoint {
   @@unique([runId, pointIndex])
   @@index([runId])
   @@map("track_points")
+}
+
+model Sleep {
+  id                  String   @id @default(uuid())
+  userId              String   @map("user_id")
+  day                 DateTime @db.Date
+  sleepTimeSec        Int?     @map("sleep_time_sec")
+  napTimeSec          Int?     @map("nap_time_sec")
+  deepSleepSec        Int?     @map("deep_sleep_sec")
+  lightSleepSec       Int?     @map("light_sleep_sec")
+  remSleepSec         Int?     @map("rem_sleep_sec")
+  awakeSleepSec       Int?     @map("awake_sleep_sec")
+  sleepStartGmt       DateTime @map("sleep_start_gmt") @db.Timestamptz(3)
+  sleepEndGmt         DateTime @map("sleep_end_gmt") @db.Timestamptz(3)
+  sleepStartLocal     DateTime @map("sleep_start_local") @db.Timestamp(3)
+  sleepEndLocal       DateTime @map("sleep_end_local") @db.Timestamp(3)
+  sleepScore          Int?     @map("sleep_score")
+  sleepScoreQualifier String?  @map("sleep_score_qualifier")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
+  @@map("sleep")
+}
+
+model BodyBattery {
+  id                  String   @id @default(uuid())
+  userId              String   @map("user_id")
+  day                 DateTime @db.Date
+  charged             Int?
+  drained             Int?
+  startTimestampGmt   DateTime @map("start_timestamp_gmt") @db.Timestamptz(3)
+  endTimestampGmt     DateTime @map("end_timestamp_gmt") @db.Timestamptz(3)
+  startTimestampLocal DateTime @map("start_timestamp_local") @db.Timestamp(3)
+  endTimestampLocal   DateTime @map("end_timestamp_local") @db.Timestamp(3)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  user     User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readings BodyBatteryReading[]
+
+  @@unique([userId, day])
+  @@map("body_battery")
+}
+
+model BodyBatteryReading {
+  id            String   @id @default(uuid())
+  bodyBatteryId String   @map("body_battery_id")
+  readingIndex  Int      @map("reading_index")
+  timestampGmt  DateTime @map("timestamp_gmt") @db.Timestamptz(3)
+  batteryLevel  Int      @map("battery_level")
+
+  bodyBattery BodyBattery @relation(fields: [bodyBatteryId], references: [id], onDelete: Cascade)
+
+  @@unique([bodyBatteryId, readingIndex])
+  @@map("body_battery_readings")
 }
 
 model ImportJob {
