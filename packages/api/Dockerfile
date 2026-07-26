@@ -20,7 +20,6 @@ CMD ["npm", "run", "dev", "--workspace", "packages/api"]
 
 FROM base AS build
 COPY . .
-RUN npm run build --workspace packages/shared
 RUN npx prisma generate --schema packages/api/prisma/schema.prisma
 RUN npm run build --workspace packages/api
 

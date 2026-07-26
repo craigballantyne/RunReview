@@ -15,7 +15,6 @@ CMD ["npm", "run", "dev", "--workspace", "packages/web", "--", "--host"]
 
 FROM base AS build
 COPY . .
-RUN npm run build --workspace packages/shared
 RUN npm run build --workspace packages/web
 
 FROM nginx:alpine AS prod
