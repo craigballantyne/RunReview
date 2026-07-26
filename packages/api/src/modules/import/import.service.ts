@@ -6,6 +6,7 @@ import type { Geocoder } from "./geocode.js";
 import type { HealthMetricsService } from "./health-metrics.service.js";
 import { peekActivityCount, streamActivities } from "./streaming-parser.js";
 import { validateActivity, type ValidatedActivity } from "./validation.js";
+import type { WeatherService } from "./weather.js";
 
 const PROGRESS_FLUSH_INTERVAL = 25;
 
@@ -13,6 +14,7 @@ export interface ImportServiceDeps {
   prisma: PrismaClient;
   geocoder: Geocoder;
   healthMetrics: HealthMetricsService;
+  weather: WeatherService;
 }
 
 /**
@@ -25,6 +27,7 @@ export function mapActivityToRunCreateInput(
   userId: string,
   externalActivityId: bigint,
   location: string | null,
+  weatherId: number | null,
 ) {
   return {
     userId,
@@ -48,6 +51,7 @@ export function mapActivityToRunCreateInput(
     startLatitude: activity.start_latitude,
     startLongitude: activity.start_longitude,
     location,
+    weatherId,
     splits: {
       createMany: {
         data: activity.splits.map((s) => ({
@@ -90,14 +94,16 @@ export function mapActivityToRunCreateInput(
   };
 }
 
-export function createImportService({ prisma, geocoder, healthMetrics }: ImportServiceDeps) {
+export function createImportService({ prisma, geocoder, healthMetrics, weather }: ImportServiceDeps) {
   async function insertRun(userId: string, activity: ValidatedActivity, externalActivityId: bigint) {
     let location: string | null = null;
+    let weatherId: number | null = null;
     if (activity.start_latitude != null && activity.start_longitude != null) {
       location = await geocoder.reverseGeocode(activity.start_latitude, activity.start_longitude);
+      weatherId = await weather.getWeatherId(activity.start_latitude, activity.start_longitude, new Date(activity.start_time_gmt));
     }
     await prisma.run.create({
-      data: mapActivityToRunCreateInput(activity, userId, externalActivityId, location),
+      data: mapActivityToRunCreateInput(activity, userId, externalActivityId, location, weatherId),
     });
   }
 

@@ -14,9 +14,11 @@ import type { FastifyInstance } from "fastify";
 import type { Geocoder } from "../../src/modules/import/geocode.js";
 import { createHealthMetricsService } from "../../src/modules/import/health-metrics.service.js";
 import { createImportService } from "../../src/modules/import/import.service.js";
+import type { WeatherService } from "../../src/modules/import/weather.js";
 import { buildApp } from "../../src/app.js";
 
 const noopGeocoder: Geocoder = { reverseGeocode: async () => null };
+const noopWeather: WeatherService = { getWeatherId: async () => null };
 
 describe("health metrics import processing", () => {
   let app: FastifyInstance;
@@ -111,6 +113,7 @@ describe("health metrics import processing", () => {
       prisma: app.prisma,
       geocoder: noopGeocoder,
       healthMetrics: createHealthMetricsService(app.prisma),
+      weather: noopWeather,
     });
     await importService.processImportJob(importJob.id, filePath);
 

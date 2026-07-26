@@ -13,7 +13,7 @@ describe("mapActivityToRunCreateInput", () => {
     expect(validated.valid).toBe(true);
     if (!validated.valid) return;
 
-    const input = mapActivityToRunCreateInput(validated.activity, "user-1", 7070576238n, "Edinburgh, UK");
+    const input = mapActivityToRunCreateInput(validated.activity, "user-1", 7070576238n, "Edinburgh, UK", 42);
 
     // activity_id -> external_activity_id, activity_type_key -> activity_type
     expect(input.externalActivityId).toBe(7070576238n);
@@ -21,6 +21,7 @@ describe("mapActivityToRunCreateInput", () => {
     expect(input.activityName).toBe("City of Edinburgh - Benchmark Run");
     expect(input.userId).toBe("user-1");
     expect(input.location).toBe("Edinburgh, UK");
+    expect(input.weatherId).toBe(42);
 
     // device_name / fetched_at / updated_at must not appear anywhere on the mapped input
     expect(input).not.toHaveProperty("deviceName");

@@ -6,6 +6,7 @@ import { loadEnv } from "../config/env.js";
 import { createGeocoder } from "../modules/import/geocode.js";
 import { createHealthMetricsService } from "../modules/import/health-metrics.service.js";
 import { createImportService } from "../modules/import/import.service.js";
+import { createWeatherService } from "../modules/import/weather.js";
 import { createRedisConnection } from "./connection.js";
 import { IMPORT_QUEUE_NAME, type ImportJobData } from "./import-queue.js";
 
@@ -18,7 +19,8 @@ async function main() {
   const connection = createRedisConnection(env);
   const geocoder = createGeocoder(prisma, env);
   const healthMetrics = createHealthMetricsService(prisma);
-  const importService = createImportService({ prisma, geocoder, healthMetrics });
+  const weather = createWeatherService(prisma);
+  const importService = createImportService({ prisma, geocoder, healthMetrics, weather });
 
   const worker = new Worker<ImportJobData>(
     IMPORT_QUEUE_NAME,

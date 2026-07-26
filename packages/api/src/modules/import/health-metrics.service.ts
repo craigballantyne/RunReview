@@ -1,22 +1,9 @@
 import type { PrismaClient } from "@prisma/client";
 import type { ValidatedActivity } from "./validation.js";
+import { toDate } from "./time-utils.js";
 
 type Sleep = NonNullable<ValidatedActivity["sleep"]>;
 type BodyBattery = NonNullable<ValidatedActivity["body_battery"]>;
-
-const HAS_TZ_SUFFIX = /(Z|[+-]\d{2}:?\d{2})$/;
-
-/**
- * Sleep's timestamps are epoch-ms numbers (always an unambiguous instant). Body_battery's are
- * ISO strings with no timezone suffix (e.g. "2026-07-21T00:00:00.0") — JS's Date constructor
- * parses date-time strings like that as the *server process's* local timezone, not UTC, so the
- * result would silently differ depending on where this code runs. Appending "Z" forces a
- * deterministic UTC interpretation regardless of server timezone.
- */
-function toDate(value: number | string): Date {
-  if (typeof value === "number") return new Date(value);
-  return new Date(HAS_TZ_SUFFIX.test(value) ? value : `${value}Z`);
-}
 
 /**
  * Both sleep and body_battery "local" fields are stored the same way as the activity's own

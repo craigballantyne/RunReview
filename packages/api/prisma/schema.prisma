@@ -101,16 +101,19 @@ model Run {
   startLatitude      Float?   @map("start_latitude")
   startLongitude     Float?   @map("start_longitude")
   location           String?
+  weatherId          Int?     @map("weather_id")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
 
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weather     WeatherHourly? @relation(fields: [weatherId], references: [id], onDelete: SetNull)
   splits      Split[]
   hrZones     HrZone[]
   trackPoints TrackPoint[]
 
   @@unique([userId, externalActivityId])
   @@index([userId, startTimeGmt])
+  @@index([weatherId])
   @@map("runs")
 }
 
@@ -270,4 +273,26 @@ model GeocodeCache {
 
   @@unique([latRounded, lonRounded])
   @@map("geocode_cache")
+}
+
+model WeatherHourly {
+  id                   Int      @id @default(autoincrement())
+  latRounded           Float    @map("lat_rounded")
+  lonRounded           Float    @map("lon_rounded")
+  timestampUtc         DateTime @map("timestamp_utc") @db.Timestamptz(3)
+  temperatureC         Float?   @map("temperature_c")
+  apparentTemperatureC Float?   @map("apparent_temperature_c")
+  relativeHumidityPct  Int?     @map("relative_humidity_pct")
+  precipitationMm      Float?   @map("precipitation_mm")
+  weatherCode          Int?     @map("weather_code")
+  cloudCoverPct        Int?     @map("cloud_cover_pct")
+  windSpeedMps         Float?   @map("wind_speed_mps")
+  windDirectionDeg     Int?     @map("wind_direction_deg")
+  windGustsMps         Float?   @map("wind_gusts_mps")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  runs Run[]
+
+  @@unique([latRounded, lonRounded, timestampUtc])
+  @@map("weather_hourly")
 }
