@@ -111,8 +111,15 @@ export const activitySchema = z
     splits: z.array(splitSchema).optional().default([]),
     hr_zones: z.array(hrZoneSchema).optional().default([]),
     track_points: z.array(trackPointSchema).optional().default([]),
-    sleep: sleepSchema.nullable().optional().default(null),
-    body_battery: bodyBatterySchema.nullable().optional().default(null),
+    // .catch(null) rather than .nullable().optional().default(null): sleep/body_battery's own
+    // required fields (e.g. sleep_start_gmt) are occasionally missing in real exports. Without
+    // .catch(), a missing/malformed required field inside either block would fail parsing for
+    // that block, which — since it's nested directly in this top-level schema — would fail the
+    // whole activity (Run, sleep, AND body_battery all skipped) over one missing timestamp.
+    // .catch() substitutes null for that block alone on any parse failure, so the activity (and
+    // whichever of sleep/body_battery is still well-formed) still imports successfully.
+    sleep: sleepSchema.nullable().catch(null),
+    body_battery: bodyBatterySchema.nullable().catch(null),
   })
   .passthrough(); // device_name / fetched_at / updated_at / unknown fields are ignored, not errors
 

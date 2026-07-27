@@ -137,12 +137,32 @@ describe("validateActivity", () => {
     }
   });
 
-  it("rejects an activity with a malformed sleep block", () => {
+  it("accepts an activity with a missing sleep_start_gmt, treating sleep as absent rather than failing the activity", () => {
+    const result = validateActivity({
+      ...baseActivity,
+      sleep: {
+        sleep_time_sec: 27840,
+        sleep_end_gmt: 1784639520000,
+        sleep_start_local: 1784614860000,
+        sleep_end_local: 1784643120000,
+        // sleep_start_gmt intentionally missing
+      },
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.activity.sleep).toBeNull();
+    }
+  });
+
+  it("accepts an activity with a completely malformed sleep block, treating sleep as absent", () => {
     const result = validateActivity({
       ...baseActivity,
       sleep: { sleep_start_gmt: "not-a-number" },
     });
-    expect(result.valid).toBe(false);
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.activity.sleep).toBeNull();
+    }
   });
 
   it("drops body_battery readings with a null field instead of failing the whole activity", () => {
@@ -170,6 +190,25 @@ describe("validateActivity", () => {
       expect(result.activity.body_battery?.charged).toBe(67);
       expect(result.activity.body_battery?.readings).toHaveLength(2);
       expect(result.activity.body_battery?.readings.map((r) => r.reading_index)).toEqual([0, 3]);
+    }
+  });
+
+  it("accepts an activity with a missing body_battery start_timestamp_local, treating body_battery as absent", () => {
+    const result = validateActivity({
+      ...baseActivity,
+      body_battery: {
+        charged: 67,
+        drained: 67,
+        start_timestamp_gmt: "2026-07-20T23:00:00.0",
+        end_timestamp_gmt: "2026-07-21T23:00:00.0",
+        end_timestamp_local: "2026-07-22T00:00:00.0",
+        // start_timestamp_local intentionally missing — used for day attribution
+        readings: [{ reading_index: 0, timestamp_gmt: 1784610900000, battery_level: 33 }],
+      },
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.activity.body_battery).toBeNull();
     }
   });
 });
