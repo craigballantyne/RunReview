@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { formatActivityDate, formatDistanceKm, formatDuration, formatPace } from "@run-review/shared";
 import { useRunDetail } from "../../api/useRuns.js";
 import { StatRow } from "./charts/StatRow.js";
+import { WeatherSummary } from "./WeatherSummary.js";
 import { PaceSection } from "./charts/PaceSection.js";
 import { HeartRateSection } from "./charts/HeartRateSection.js";
 import { HeartRateZonesSection } from "./charts/HeartRateZonesSection.js";
@@ -62,6 +63,12 @@ export function RunMetricsDrawer({ runId, isOpen, onClose }: RunMetricsDrawerPro
               {formatActivityDate(run.startTimeLocal)}
               {run.location ? ` · ${run.location}` : ""}
             </p>
+
+            {run.weather && (
+              <div className="mt-3">
+                <WeatherSummary weather={run.weather} />
+              </div>
+            )}
 
             <div className="mt-4">
               <StatRow

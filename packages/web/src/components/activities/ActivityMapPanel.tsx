@@ -9,6 +9,7 @@ import { buildGradientSegments } from "../../lib/route-gradient.js";
 import { EDINBURGH_FALLBACK, getCurrentPositionOrFallback, type LatLng } from "../../lib/geolocation.js";
 import { RouteStyleControl, type RouteStyle } from "./RouteStyleControl.js";
 import { RunMetricsDrawer } from "./RunMetricsDrawer.js";
+import { WeatherPanel } from "./WeatherPanel.js";
 
 const MAX_ANIMATION_SEC = 10;
 const MIN_ANIMATION_MS = 300;
@@ -161,6 +162,7 @@ export function ActivityMapPanel({ selectedRunId }: ActivityMapPanelProps) {
           onOpenAllMetrics={() => setIsMetricsOpen(true)}
         />
       )}
+      <WeatherPanel runId={selectedRunId} />
       {hasNoMapData && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80">
           <p className="rounded-md bg-gray-900/90 px-4 py-2 text-sm font-medium text-white">

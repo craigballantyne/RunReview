@@ -46,6 +46,13 @@ export interface TrackPoint {
   speedMps: number | null;
 }
 
+export interface RunWeather {
+  temperatureC: number | null;
+  weatherCode: number | null;
+  windSpeedMps: number | null;
+  windDirectionDeg: number | null;
+}
+
 export interface RunDetail extends RunListItem {
   externalActivityId: string;
   startTimeGmt: string;
@@ -61,6 +68,7 @@ export interface RunDetail extends RunListItem {
   calories: number | null;
   startLatitude: number | null;
   startLongitude: number | null;
+  weather: RunWeather | null;
   splits: Split[];
   hrZones: HrZone[];
   trackPoints: TrackPoint[];

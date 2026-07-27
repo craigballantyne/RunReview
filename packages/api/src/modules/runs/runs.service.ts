@@ -87,6 +87,7 @@ export function createRunsService({ prisma }: RunsServiceDeps) {
           splits: { orderBy: { splitIndex: "asc" } },
           hrZones: { orderBy: { zoneNumber: "asc" } },
           trackPoints: { orderBy: { pointIndex: "asc" } },
+          weather: true,
         },
       });
 
@@ -116,6 +117,14 @@ export function createRunsService({ prisma }: RunsServiceDeps) {
         calories: run.calories,
         startLatitude: run.startLatitude,
         startLongitude: run.startLongitude,
+        weather: run.weather
+          ? {
+              temperatureC: run.weather.temperatureC,
+              weatherCode: run.weather.weatherCode,
+              windSpeedMps: run.weather.windSpeedMps,
+              windDirectionDeg: run.weather.windDirectionDeg,
+            }
+          : null,
         splits: run.splits.map((s) => ({
           id: s.id,
           splitIndex: s.splitIndex,
