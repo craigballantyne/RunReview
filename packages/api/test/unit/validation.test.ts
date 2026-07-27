@@ -144,4 +144,32 @@ describe("validateActivity", () => {
     });
     expect(result.valid).toBe(false);
   });
+
+  it("drops body_battery readings with a null field instead of failing the whole activity", () => {
+    const result = validateActivity({
+      ...baseActivity,
+      body_battery: {
+        charged: 67,
+        drained: 67,
+        start_timestamp_gmt: "2026-07-20T23:00:00.0",
+        end_timestamp_gmt: "2026-07-21T23:00:00.0",
+        start_timestamp_local: "2026-07-21T00:00:00.0",
+        end_timestamp_local: "2026-07-22T00:00:00.0",
+        readings: [
+          { reading_index: 0, timestamp_gmt: 1784610900000, battery_level: 33 },
+          { reading_index: 1, timestamp_gmt: 1784616840000, battery_level: null }, // dropped
+          { reading_index: 2, timestamp_gmt: null, battery_level: 48 }, // dropped
+          null, // dropped
+          { reading_index: 3, timestamp_gmt: 1784617200000, battery_level: 49 },
+        ],
+      },
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      // base body_battery values and the good readings survive; only the bad entries are dropped
+      expect(result.activity.body_battery?.charged).toBe(67);
+      expect(result.activity.body_battery?.readings).toHaveLength(2);
+      expect(result.activity.body_battery?.readings.map((r) => r.reading_index)).toEqual([0, 3]);
+    }
+  });
 });

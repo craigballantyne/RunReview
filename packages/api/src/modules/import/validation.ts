@@ -50,11 +50,23 @@ const sleepSchema = z.object({
 // Readings use epoch-ms timestamps (like sleep), while the parent window uses ISO strings
 // (like the activity's own start_time_gmt/start_time_local) — an intentional asymmetry in the
 // source data, not a typo.
-const bodyBatteryReadingSchema = z.object({
-  reading_index: z.number().int(),
-  timestamp_gmt: z.number(),
-  battery_level: z.number().int(),
-});
+interface BodyBatteryReading {
+  reading_index: number;
+  timestamp_gmt: number;
+  battery_level: number;
+}
+
+// Real exports occasionally have individual readings with a null field (e.g. a momentary gap in
+// battery_level) or a null entry outright. A single bad reading shouldn't fail the whole
+// activity — parse permissively, then drop only the malformed entries, keeping the rest of the
+// readings and the base body_battery values (charged/drained/window) intact.
+const looseBodyBatteryReadingSchema = z
+  .object({
+    reading_index: z.number().int().nullable(),
+    timestamp_gmt: z.number().nullable(),
+    battery_level: z.number().int().nullable(),
+  })
+  .nullable();
 
 const bodyBatterySchema = z.object({
   charged: z.number().int().nullable().optional().default(null),
@@ -63,7 +75,16 @@ const bodyBatterySchema = z.object({
   end_timestamp_gmt: z.string(),
   start_timestamp_local: z.string(),
   end_timestamp_local: z.string(),
-  readings: z.array(bodyBatteryReadingSchema).optional().default([]),
+  readings: z
+    .array(looseBodyBatteryReadingSchema)
+    .optional()
+    .default([])
+    .transform((readings) =>
+      readings.filter(
+        (r): r is BodyBatteryReading =>
+          r !== null && r.reading_index !== null && r.timestamp_gmt !== null && r.battery_level !== null,
+      ),
+    ),
 });
 
 export const activitySchema = z
