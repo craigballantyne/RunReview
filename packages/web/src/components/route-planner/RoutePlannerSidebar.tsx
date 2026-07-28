@@ -2,11 +2,14 @@ import { useState } from "react";
 import { formatDistanceKm } from "@run-review/shared";
 import { ConfirmModal } from "../common/ConfirmModal.js";
 import { StatRow } from "../activities/charts/StatRow.js";
+import { TrackPointChart } from "../activities/charts/TrackPointChart.js";
 import type { RoutePlan } from "../../routes/useRoutePlan.js";
 
 interface RoutePlannerSidebarProps {
   plan: RoutePlan;
 }
+
+const ELEVATION_COLOR = "#16a34a"; // green-600 — matches ElevationSection.tsx's run elevation chart
 
 function formatMeters(value: number): string {
   return `${Math.round(value)} m`;
@@ -14,7 +17,7 @@ function formatMeters(value: number): string {
 
 export function RoutePlannerSidebar({ plan }: RoutePlannerSidebarProps) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const { points, startLocation, stats, undo, completeLoop, clear } = plan;
+  const { points, startLocation, stats, elevationProfile, undo, completeLoop, clear } = plan;
 
   if (points.length === 0) {
     return (
@@ -27,7 +30,7 @@ export function RoutePlannerSidebar({ plan }: RoutePlannerSidebarProps) {
   const hasMultiplePoints = points.length > 1;
 
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="flex h-full flex-col overflow-y-auto p-6">
       <h2 className="text-lg font-semibold text-gray-900">Running from {startLocation ?? "your starting point"}</h2>
 
       <div className="mt-4">
@@ -39,6 +42,20 @@ export function RoutePlannerSidebar({ plan }: RoutePlannerSidebarProps) {
           ]}
         />
       </div>
+
+      {elevationProfile.length > 0 && (
+        <div className="mt-6">
+          <h3 className="mb-2 text-sm font-semibold text-gray-900">Elevation</h3>
+          <TrackPointChart
+            points={elevationProfile.map((p) => ({ x: p.distanceM, y: p.elevationM }))}
+            mark="area"
+            color={ELEVATION_COLOR}
+            xTickFormat={formatDistanceKm}
+            yTickFormat={(v) => `${Math.round(v)}m`}
+            tooltipValueFormat={(v) => `${Math.round(v)} m`}
+          />
+        </div>
+      )}
 
       <div className="mt-auto space-y-2 pt-6">
         <div className="grid grid-cols-2 gap-2">

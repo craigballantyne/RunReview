@@ -8,10 +8,17 @@ const ORS_MIN_INTERVAL_MS = 1000;
 const SNAP_RADIUS_M = 350; // OpenRouteService's own default max snapping radius
 const PROFILE = "foot-walking";
 const ORS_BASE_URL = "https://api.openrouteservice.org";
+const EARTH_RADIUS_M = 6371000;
 
 export interface LatLon {
   lat: number;
   lon: number;
+}
+
+export interface ElevationPoint {
+  /** Cumulative distance from the route's start, in meters. */
+  distanceM: number;
+  elevationM: number;
 }
 
 export interface RouteResult {
@@ -22,6 +29,8 @@ export interface RouteResult {
   /** Each input point's position snapped onto the drawn route, so markers sit on the line
    * instead of floating at the raw click position. */
   snappedPoints: LatLon[];
+  /** One entry per geometry point, for the route planner's elevation-vs-distance chart. */
+  elevationProfile: ElevationPoint[];
 }
 
 /** Thrown on a failed route calculation — unlike geocode.ts/weather.ts's silent-null philosophy,
@@ -55,6 +64,29 @@ export interface RouteService {
   snapToRoad(point: LatLon): Promise<LatLon | null>;
   /** Throws RouteCalculationError on failure — this is the interactive path, not best-effort. */
   calculateRoute(points: LatLon[]): Promise<RouteResult>;
+}
+
+function haversineDistanceM(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(h));
+}
+
+/** Builds one point per geometry coordinate, walking cumulative distance from the route start —
+ * this is what makes an elevation-vs-distance chart possible, since ORS's own summary only gives
+ * the route's total distance, not a running total per point. */
+function buildElevationProfile(coordinates: [number, number, number?][]): ElevationPoint[] {
+  let cumulativeDistanceM = 0;
+  return coordinates.map((coord, i) => {
+    const [lon, lat, elevation] = coord;
+    if (i > 0) {
+      const [prevLon, prevLat] = coordinates[i - 1]!;
+      cumulativeDistanceM += haversineDistanceM(prevLat, prevLon, lat, lon);
+    }
+    return { distanceM: cumulativeDistanceM, elevationM: elevation ?? 0 };
+  });
 }
 
 function nearestPointOnGeometry(point: LatLon, geometry: [number, number][]): LatLon {
@@ -125,6 +157,7 @@ export function createRouteService(config: Env): RouteService {
       // Derived by nearest-point-on-line rather than trusting an ORS-provided per-waypoint index
       // (that field's exact shape isn't confirmed) — self-contained and robust either way.
       snappedPoints: points.map((p) => nearestPointOnGeometry(p, geometryLatLng)),
+      elevationProfile: buildElevationProfile(coordinates),
     };
   }
 

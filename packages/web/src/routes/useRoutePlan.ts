@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useCalculateRoute, useSnapStartPoint, type LatLon } from "../api/useRoutePlanner.js";
+import { useCalculateRoute, useSnapStartPoint, type ElevationPoint, type LatLon } from "../api/useRoutePlanner.js";
 import { useToast } from "../components/common/ToastProvider.js";
 
 export interface RoutePoint {
@@ -28,6 +28,7 @@ export function useRoutePlan() {
   const [startLocation, setStartLocation] = useState<string | null>(null);
   const [routeGeometry, setRouteGeometry] = useState<RoutePoint[]>([]);
   const [stats, setStats] = useState<RouteStats>(ZERO_STATS);
+  const [elevationProfile, setElevationProfile] = useState<ElevationPoint[]>([]);
 
   const snapMutation = useSnapStartPoint();
   const routeMutation = useCalculateRoute();
@@ -43,6 +44,7 @@ export function useRoutePlan() {
         setRouteGeometry(result.geometryLatLng.map(([lat, lng]) => ({ lat, lng })));
         setStats({ distanceM: result.distanceM, ascentM: result.ascentM, descentM: result.descentM });
         setPoints(result.snappedPoints.map(toRoutePoint));
+        setElevationProfile(result.elevationProfile);
       } catch {
         showToast("Couldn't calculate that route — try adjusting your points", "error");
       }
@@ -81,6 +83,7 @@ export function useRoutePlan() {
       setPoints(next);
       setRouteGeometry([]);
       setStats(ZERO_STATS);
+      setElevationProfile([]);
       return;
     }
     await recalculate(next);
@@ -96,6 +99,7 @@ export function useRoutePlan() {
     setStartLocation(null);
     setRouteGeometry([]);
     setStats(ZERO_STATS);
+    setElevationProfile([]);
   }, []);
 
   return {
@@ -103,6 +107,7 @@ export function useRoutePlan() {
     startLocation,
     routeGeometry,
     stats,
+    elevationProfile,
     isCalculating: snapMutation.isPending || routeMutation.isPending,
     addPoint,
     undo,

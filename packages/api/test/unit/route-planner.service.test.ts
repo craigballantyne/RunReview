@@ -73,6 +73,7 @@ describe("createRoutePlannerService.calculateRoute", () => {
       ascentM: 1,
       descentM: 2,
       snappedPoints: [{ lat: 55, lon: -3 }],
+      elevationProfile: [{ distanceM: 0, elevationM: 42 }],
     };
     const routeService = { snapToRoad: vi.fn(), calculateRoute: vi.fn(async () => routeResult) } satisfies RouteService;
     const geocoder = { reverseGeocode: vi.fn(), reverseGeocodeStreet: vi.fn() } satisfies Geocoder;

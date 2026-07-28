@@ -12,12 +12,18 @@ export interface SnapStartPointResult {
   location: string | null;
 }
 
+export interface ElevationPoint {
+  distanceM: number;
+  elevationM: number;
+}
+
 export interface CalculateRouteResult {
   geometryLatLng: [number, number][];
   distanceM: number;
   ascentM: number;
   descentM: number;
   snappedPoints: LatLon[];
+  elevationProfile: ElevationPoint[];
 }
 
 export function useSnapStartPoint() {
