@@ -11,6 +11,7 @@ const envSchema = z.object({
   APP_BASE_URL: z.string().url(),
   API_BASE_URL: z.string().url(),
   NOMINATIM_USER_AGENT: z.string().min(1),
+  OPENROUTESERVICE_API_KEY: z.string().min(1),
   IMPORT_UPLOAD_DIR: z.string().min(1),
   IMPORT_MAX_FILE_SIZE_BYTES: z.coerce.number().int().positive().default(268_435_456),
   PORT: z.coerce.number().int().positive().default(3000),

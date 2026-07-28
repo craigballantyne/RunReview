@@ -22,7 +22,11 @@ export function ConfirmModal({
   confirmDisabled = false,
 }: ConfirmModalProps) {
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4">
+    // z-[2000] (not the more typical z-40) to reliably sit above a Leaflet map — this app's map
+    // panes/controls already go up to z-[1000] (see RouteStyleControl/WeatherPanel), and Leaflet
+    // establishes its own stacking context, so a lower z-index here renders visually behind the
+    // map wherever they overlap. Matches RunMetricsDrawer's full-viewport overlay precedent.
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
         <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
         <div className="mt-2 text-sm text-gray-600">{description}</div>

@@ -79,4 +79,50 @@ describe("createGeocoder", () => {
     const location = await geocoder.reverseGeocode(2, 2);
     expect(location).toBeNull();
   });
+
+  it("reverseGeocodeStreet returns the street name, not locality/country", async () => {
+    fetchMock.mockImplementation(
+      async () =>
+        new Response(
+          JSON.stringify({ address: { road: "Royal Mile", city: "Edinburgh", country: "United Kingdom" } }),
+          { status: 200 },
+        ),
+    );
+    const prisma = createFakePrisma();
+    const geocoder = createGeocoder(prisma as never, fakeEnv);
+
+    const street = await geocoder.reverseGeocodeStreet(55.9533, -3.1883);
+    expect(street).toBe("Royal Mile");
+  });
+
+  it("reverseGeocodeStreet does not read or write geocode_cache (kept independent of reverseGeocode's locality cache)", async () => {
+    const prisma = createFakePrisma();
+    const geocoder = createGeocoder(prisma as never, fakeEnv);
+
+    fetchMock.mockImplementation(
+      async () => new Response(JSON.stringify({ address: { road: "Royal Mile" } }), { status: 200 }),
+    );
+    await geocoder.reverseGeocodeStreet(55.9533, -3.1883);
+
+    expect(prisma.geocodeCache.findUnique).not.toHaveBeenCalled();
+    expect(prisma.geocodeCache.upsert).not.toHaveBeenCalled();
+  });
+
+  it("reverseGeocodeStreet returns null when no road-level field is present", async () => {
+    fetchMock.mockImplementation(async () => new Response(JSON.stringify({ address: { city: "Edinburgh" } }), { status: 200 }));
+    const prisma = createFakePrisma();
+    const geocoder = createGeocoder(prisma as never, fakeEnv);
+
+    expect(await geocoder.reverseGeocodeStreet(1, 1)).toBeNull();
+  });
+
+  it("reverseGeocodeStreet returns null (never throws) on network failure", async () => {
+    fetchMock.mockImplementation(async () => {
+      throw new Error("network down");
+    });
+    const prisma = createFakePrisma();
+    const geocoder = createGeocoder(prisma as never, fakeEnv);
+
+    expect(await geocoder.reverseGeocodeStreet(1, 1)).toBeNull();
+  });
 });

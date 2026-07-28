@@ -12,6 +12,12 @@ function round(value: number): number {
 
 export interface Geocoder {
   reverseGeocode(latitude: number, longitude: number): Promise<string | null>;
+  /** Street name only (e.g. "Royal Mile"), not locality/country — used by the route planner's
+   * "Running from [street]" label. Deliberately not cached in geocode_cache: that table is keyed
+   * by rounded lat/lon to a single locality-format string, and reusing it here would risk a
+   * street-name lookup returning a stale locality string cached earlier by the import pipeline
+   * (or vice versa) for the same rounded coordinate. */
+  reverseGeocodeStreet(latitude: number, longitude: number): Promise<string | null>;
 }
 
 export function createGeocoder(prisma: PrismaClient, config: Env): Geocoder {
@@ -42,6 +48,26 @@ export function createGeocoder(prisma: PrismaClient, config: Env): Geocoder {
     return body.display_name ?? null;
   }
 
+  async function fetchStreetFromNominatim(latitude: number, longitude: number): Promise<string | null> {
+    const url = new URL("https://nominatim.openstreetmap.org/reverse");
+    url.searchParams.set("lat", String(latitude));
+    url.searchParams.set("lon", String(longitude));
+    url.searchParams.set("format", "jsonv2");
+    url.searchParams.set("zoom", "17"); // major/minor street level, so address.road is populated
+
+    const response = await fetch(url, {
+      headers: { "User-Agent": config.NOMINATIM_USER_AGENT },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const body = (await response.json()) as { address?: Record<string, string> };
+    const address = body.address ?? {};
+    return address.road ?? address.pedestrian ?? address.footway ?? null;
+  }
+
   return {
     async reverseGeocode(latitude: number, longitude: number): Promise<string | null> {
       const latRounded = round(latitude);
@@ -67,6 +93,15 @@ export function createGeocoder(prisma: PrismaClient, config: Env): Geocoder {
         return location;
       } catch {
         // Geocoding failure never fails the activity import — location just stays null.
+        return null;
+      }
+    },
+
+    async reverseGeocodeStreet(latitude: number, longitude: number): Promise<string | null> {
+      try {
+        const street = await queue.add(() => fetchStreetFromNominatim(latitude, longitude));
+        return street ?? null;
+      } catch {
         return null;
       }
     },

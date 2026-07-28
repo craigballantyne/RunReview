@@ -17,7 +17,7 @@ import { createImportService } from "../../src/modules/import/import.service.js"
 import type { WeatherService } from "../../src/modules/import/weather.js";
 import { buildApp } from "../../src/app.js";
 
-const noopGeocoder: Geocoder = { reverseGeocode: async () => null };
+const noopGeocoder: Geocoder = { reverseGeocode: async () => null, reverseGeocodeStreet: async () => null };
 const noopWeather: WeatherService = { getWeatherId: async () => null };
 
 describe("health metrics import processing", () => {

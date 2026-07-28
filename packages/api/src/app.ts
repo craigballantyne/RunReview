@@ -13,6 +13,7 @@ import { authRoutes } from "./modules/auth/auth.routes.js";
 import { accountRoutes } from "./modules/account/account.routes.js";
 import { runsRoutes } from "./modules/runs/runs.routes.js";
 import { importRoutes } from "./modules/import/import.routes.js";
+import { routePlannerRoutes } from "./modules/route-planner/route-planner.routes.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const fastify = Fastify({
@@ -35,6 +36,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await fastify.register(accountRoutes, { prefix: "/api/account" });
   await fastify.register(runsRoutes, { prefix: "/api/runs" });
   await fastify.register(importRoutes, { prefix: "/api/import" });
+  await fastify.register(routePlannerRoutes, { prefix: "/api/route-planner" });
 
   fastify.get("/api/health", async () => ({ status: "ok" }));
 

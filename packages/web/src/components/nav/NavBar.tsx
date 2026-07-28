@@ -14,14 +14,24 @@ export function NavBar() {
           Run Review
         </Link>
         {user && (
-          <NavLink
-            to="/activities"
-            className={({ isActive }: { isActive: boolean }) =>
-              `text-sm font-medium ${isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`
-            }
-          >
-            Activities
-          </NavLink>
+          <>
+            <NavLink
+              to="/activities"
+              className={({ isActive }: { isActive: boolean }) =>
+                `text-sm font-medium ${isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`
+              }
+            >
+              Activities
+            </NavLink>
+            <NavLink
+              to="/route-planner"
+              className={({ isActive }: { isActive: boolean }) =>
+                `text-sm font-medium ${isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`
+              }
+            >
+              Route planner
+            </NavLink>
+          </>
         )}
       </div>
       {user ? (

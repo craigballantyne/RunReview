@@ -14,7 +14,7 @@ import { createImportService } from "../../src/modules/import/import.service.js"
 import { createWeatherService } from "../../src/modules/import/weather.js";
 import { buildApp } from "../../src/app.js";
 
-const noopGeocoder: Geocoder = { reverseGeocode: async () => null };
+const noopGeocoder: Geocoder = { reverseGeocode: async () => null, reverseGeocodeStreet: async () => null };
 
 function openMeteoResponse() {
   const times = ["2027-04-01T07:00", "2027-04-01T08:00", "2027-04-01T14:00"];
