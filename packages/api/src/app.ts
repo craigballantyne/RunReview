@@ -23,23 +23,12 @@ export async function buildApp(): Promise<FastifyInstance> {
     },
   });
 
-  await fastify.register(configPlugin);
-  await fastify.register(prismaPlugin);
-  await fastify.register(cookiePlugin);
-  await fastify.register(corsPlugin);
-  await fastify.register(multipartPlugin);
-  await fastify.register(rateLimitPlugin);
-  await fastify.register(importQueuePlugin);
-  await fastify.register(sessionPlugin);
-
-  await fastify.register(authRoutes, { prefix: "/api/auth" });
-  await fastify.register(accountRoutes, { prefix: "/api/account" });
-  await fastify.register(runsRoutes, { prefix: "/api/runs" });
-  await fastify.register(importRoutes, { prefix: "/api/import" });
-  await fastify.register(routePlannerRoutes, { prefix: "/api/route-planner" });
-
-  fastify.get("/api/health", async () => ({ status: "ok" }));
-
+  // Must run before any fastify.register() calls below: Fastify's encapsulation model doesn't
+  // retroactively propagate setErrorHandler into already-registered child plugin contexts (each
+  // route module below is its own encapsulated child via register()) — calling this after they're
+  // registered silently leaves every one of them on Fastify's own default error handler instead,
+  // which is why every error response was showing Fastify's default shape rather than this one
+  // (confirmed via a minimal reproduction against this exact Fastify version).
   fastify.setErrorHandler((error, _req, reply) => {
     if (error instanceof AppError) {
       reply.status(error.statusCode).send({ error: { code: error.code, message: error.message } });
@@ -58,6 +47,23 @@ export async function buildApp(): Promise<FastifyInstance> {
     fastify.log.error(error);
     reply.status(500).send({ error: { code: "INTERNAL_ERROR", message: "Something went wrong" } });
   });
+
+  await fastify.register(configPlugin);
+  await fastify.register(prismaPlugin);
+  await fastify.register(cookiePlugin);
+  await fastify.register(corsPlugin);
+  await fastify.register(multipartPlugin);
+  await fastify.register(rateLimitPlugin);
+  await fastify.register(importQueuePlugin);
+  await fastify.register(sessionPlugin);
+
+  await fastify.register(authRoutes, { prefix: "/api/auth" });
+  await fastify.register(accountRoutes, { prefix: "/api/account" });
+  await fastify.register(runsRoutes, { prefix: "/api/runs" });
+  await fastify.register(importRoutes, { prefix: "/api/import" });
+  await fastify.register(routePlannerRoutes, { prefix: "/api/route-planner" });
+
+  fastify.get("/api/health", async () => ({ status: "ok" }));
 
   return fastify;
 }
