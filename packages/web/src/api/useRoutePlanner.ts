@@ -6,7 +6,7 @@ export interface LatLon {
   lon: number;
 }
 
-export interface SnapStartPointResult {
+export interface SnapPointResult {
   lat: number;
   lon: number;
   location: string | null;
@@ -26,9 +26,10 @@ export interface CalculateRouteResult {
   elevationProfile: ElevationPoint[];
 }
 
-export function useSnapStartPoint() {
+export function useSnapPoint() {
   return useMutation({
-    mutationFn: (point: LatLon) => apiClient.post<SnapStartPointResult>("/route-planner/snap", point),
+    mutationFn: (point: LatLon & { includeLocation?: boolean }) =>
+      apiClient.post<SnapPointResult>("/route-planner/snap", point),
   });
 }
 

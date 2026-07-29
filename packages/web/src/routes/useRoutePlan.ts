@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useCalculateRoute, useSnapStartPoint, type ElevationPoint, type LatLon } from "../api/useRoutePlanner.js";
+import { useCalculateRoute, useSnapPoint, type ElevationPoint, type LatLon } from "../api/useRoutePlanner.js";
 import { useToast } from "../components/common/ToastProvider.js";
 
 export interface RoutePoint {
@@ -30,7 +30,7 @@ export function useRoutePlan() {
   const [stats, setStats] = useState<RouteStats>(ZERO_STATS);
   const [elevationProfile, setElevationProfile] = useState<ElevationPoint[]>([]);
 
-  const snapMutation = useSnapStartPoint();
+  const snapMutation = useSnapPoint();
   const routeMutation = useCalculateRoute();
   const { showToast } = useToast();
 
@@ -94,6 +94,63 @@ export function useRoutePlan() {
     await recalculate([...points, points[0]!]);
   }, [points, recalculate]);
 
+  // Repositions an existing point (drag-and-drop) — snaps the new position to the nearest
+  // road/path, then recalculates the route through the updated point set. Moving the start point
+  // (index 0) also re-resolves its label, matching addFirstPoint's behavior; any other point only
+  // needs snapping (includeLocation: false skips the unnecessary geocode call).
+  const movePoint = useCallback(
+    async (index: number, lat: number, lng: number) => {
+      if (index === 0 && points.length <= 1) {
+        await addFirstPoint(lat, lng);
+        return;
+      }
+
+      // Optimistic update: since `position` is a controlled prop on the marker, leaving `points`
+      // unchanged until the snap/recalculate round-trip resolves means the marker briefly
+      // reverts to its pre-drag position on every render in between — visible as a snap-back
+      // flicker right after the user drops it. Placing it at the dropped coordinates immediately
+      // (then reconciling with the server's snapped position once it arrives) avoids that.
+      const previousPoints = points;
+      const optimisticPoints = points.map((p, i) => (i === index ? { lat, lng } : p));
+      setPoints(optimisticPoints);
+
+      try {
+        const result = await snapMutation.mutateAsync({ lat, lon: lng, includeLocation: index === 0 });
+        if (index === 0) {
+          setStartLocation(result.location);
+        }
+        const nextPoints = optimisticPoints.map((p, i) => (i === index ? { lat: result.lat, lng: result.lon } : p));
+        await recalculate(nextPoints);
+      } catch {
+        setPoints(previousPoints);
+        showToast("Couldn't move that point there — try again", "error");
+      }
+    },
+    [points, addFirstPoint, snapMutation, recalculate, showToast],
+  );
+
+  // Inserts a new point into the middle of the route (mid-route click/click-and-drag) at the
+  // given index — always index 1..points.length-1, never the start point, so no location label
+  // to re-resolve. Same optimistic-update-then-reconcile shape as movePoint, for the same reason
+  // (avoids the new marker flickering back out before the snap/recalculate round-trip resolves).
+  const insertPoint = useCallback(
+    async (index: number, lat: number, lng: number) => {
+      const previousPoints = points;
+      const optimisticPoints = [...points.slice(0, index), { lat, lng }, ...points.slice(index)];
+      setPoints(optimisticPoints);
+
+      try {
+        const result = await snapMutation.mutateAsync({ lat, lon: lng, includeLocation: false });
+        const nextPoints = [...optimisticPoints.slice(0, index), { lat: result.lat, lng: result.lon }, ...optimisticPoints.slice(index + 1)];
+        await recalculate(nextPoints);
+      } catch {
+        setPoints(previousPoints);
+        showToast("Couldn't add a point there — try again", "error");
+      }
+    },
+    [points, snapMutation, recalculate, showToast],
+  );
+
   const clear = useCallback(() => {
     setPoints([]);
     setStartLocation(null);
@@ -110,6 +167,8 @@ export function useRoutePlan() {
     elevationProfile,
     isCalculating: snapMutation.isPending || routeMutation.isPending,
     addPoint,
+    movePoint,
+    insertPoint,
     undo,
     completeLoop,
     clear,

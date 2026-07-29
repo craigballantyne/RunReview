@@ -35,8 +35,8 @@ describe("createRoutePlannerService.getHeatmapPoints", () => {
   });
 });
 
-describe("createRoutePlannerService.snapStartPoint", () => {
-  it("snaps the point and resolves a street-level location label", async () => {
+describe("createRoutePlannerService.snapPoint", () => {
+  it("snaps the point and resolves a street-level location label when includeLocation is true", async () => {
     const routeService = {
       snapToRoad: vi.fn(async () => ({ lat: 55.95, lon: -3.19 })),
       calculateRoute: vi.fn(),
@@ -47,11 +47,25 @@ describe("createRoutePlannerService.snapStartPoint", () => {
     } satisfies Geocoder;
 
     const service = createRoutePlannerService({ prisma: {} as never, routeService, geocoder });
-    const result = await service.snapStartPoint(55.9533, -3.1883);
+    const result = await service.snapPoint(55.9533, -3.1883, true);
 
     expect(result).toEqual({ lat: 55.95, lon: -3.19, location: "Royal Mile" });
     expect(geocoder.reverseGeocodeStreet).toHaveBeenCalledWith(55.95, -3.19); // geocodes the SNAPPED point, not the raw click
     expect(geocoder.reverseGeocode).not.toHaveBeenCalled(); // uses the street-level lookup, not the locality one
+  });
+
+  it("skips the geocode lookup entirely when includeLocation is false", async () => {
+    const routeService = {
+      snapToRoad: vi.fn(async () => ({ lat: 55.95, lon: -3.19 })),
+      calculateRoute: vi.fn(),
+    } satisfies RouteService;
+    const geocoder = { reverseGeocode: vi.fn(), reverseGeocodeStreet: vi.fn(async () => "Royal Mile") } satisfies Geocoder;
+
+    const service = createRoutePlannerService({ prisma: {} as never, routeService, geocoder });
+    const result = await service.snapPoint(55.9533, -3.1883, false);
+
+    expect(result).toEqual({ lat: 55.95, lon: -3.19, location: null });
+    expect(geocoder.reverseGeocodeStreet).not.toHaveBeenCalled();
   });
 
   it("falls back to the raw coordinates when snapping fails, rather than blocking the user", async () => {
@@ -59,7 +73,7 @@ describe("createRoutePlannerService.snapStartPoint", () => {
     const geocoder = { reverseGeocode: vi.fn(), reverseGeocodeStreet: vi.fn(async () => null) } satisfies Geocoder;
 
     const service = createRoutePlannerService({ prisma: {} as never, routeService, geocoder });
-    const result = await service.snapStartPoint(55.9533, -3.1883);
+    const result = await service.snapPoint(55.9533, -3.1883, true);
 
     expect(result).toEqual({ lat: 55.9533, lon: -3.1883, location: null });
   });

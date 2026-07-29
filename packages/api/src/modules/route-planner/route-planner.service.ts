@@ -8,7 +8,7 @@ export interface RoutePlannerServiceDeps {
   geocoder: Geocoder;
 }
 
-export interface StartPointResult {
+export interface SnapPointResult {
   lat: number;
   lon: number;
   location: string | null;
@@ -29,13 +29,16 @@ export function createRoutePlannerService({ prisma, routeService, geocoder }: Ro
         .map((p) => [p.latitude, p.longitude]);
     },
 
-    /** Snaps the very first route point to the nearest road/path and resolves a street-level
-     * label for it (not locality/country — see reverseGeocodeStreet's doc comment). Falls back to
-     * the raw clicked coordinates if snapping fails — better to place the marker somewhere than
-     * block the user over a supplementary lookup failing. */
-    async snapStartPoint(lat: number, lon: number): Promise<StartPointResult> {
+    /** Snaps a route point to the nearest road/path — used both for placing the very first point
+     * and for repositioning any existing point via drag-and-drop. Falls back to the raw
+     * coordinates if snapping fails — better to place the marker somewhere than block the user
+     * over a supplementary lookup failing. Resolves a street-level label (not locality/country —
+     * see reverseGeocodeStreet's doc comment) only when `includeLocation` is true, since that's
+     * only meaningful for the start point's "Running from X" title — skipping it for every other
+     * point drag avoids an unnecessary geocode call. */
+    async snapPoint(lat: number, lon: number, includeLocation: boolean): Promise<SnapPointResult> {
       const snapped = (await routeService.snapToRoad({ lat, lon })) ?? { lat, lon };
-      const location = await geocoder.reverseGeocodeStreet(snapped.lat, snapped.lon);
+      const location = includeLocation ? await geocoder.reverseGeocodeStreet(snapped.lat, snapped.lon) : null;
       return { lat: snapped.lat, lon: snapped.lon, location };
     },
 

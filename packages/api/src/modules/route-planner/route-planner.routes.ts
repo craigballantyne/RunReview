@@ -4,7 +4,7 @@ import { AppError } from "../../lib/errors.js";
 import { createGeocoder } from "../import/geocode.js";
 import { createRouteService, RouteCalculationError } from "./openroute.js";
 import { createRoutePlannerService } from "./route-planner.service.js";
-import { calculateRouteSchema, snapStartPointSchema } from "./route-planner.schemas.js";
+import { calculateRouteSchema, snapPointSchema } from "./route-planner.schemas.js";
 
 export async function routePlannerRoutes(fastify: FastifyInstance): Promise<void> {
   const geocoder = createGeocoder(fastify.prisma, fastify.config);
@@ -14,8 +14,8 @@ export async function routePlannerRoutes(fastify: FastifyInstance): Promise<void
   fastify.addHook("preHandler", requireVerified);
 
   fastify.post("/snap", async (req, reply) => {
-    const { lat, lon } = snapStartPointSchema.parse(req.body);
-    const result = await routePlannerService.snapStartPoint(lat, lon);
+    const { lat, lon, includeLocation } = snapPointSchema.parse(req.body);
+    const result = await routePlannerService.snapPoint(lat, lon, includeLocation);
     reply.send(result);
   });
 
