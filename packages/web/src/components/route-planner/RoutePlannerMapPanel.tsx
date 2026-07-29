@@ -22,6 +22,13 @@ interface HoverInsertState {
   insertIndex: number;
 }
 
+interface DragPreviewState {
+  lat: number;
+  lng: number;
+  before: RoutePoint | null;
+  after: RoutePoint | null;
+}
+
 /** Squared perpendicular distance from `p` to the segment a→b (lat/lng treated as a flat plane —
  * an approximation, but segments between consecutive route points are short enough that this is
  * accurate enough for picking "which gap is closest", which is all this needs to do). */
@@ -129,12 +136,13 @@ interface RoutePointMarkerProps {
   point: RoutePoint;
   draggable: boolean;
   onDragStart: () => void;
+  onDrag: (lat: number, lng: number) => void;
   onMoveEnd: (lat: number, lng: number) => void;
 }
 
 /** A hover-responsive, draggable marker for one route point. Hover state lives here (not lifted
  * up) since it's purely a per-marker visual affordance with no effect on route data. */
-function RoutePointMarker({ point, draggable, onDragStart, onMoveEnd }: RoutePointMarkerProps) {
+function RoutePointMarker({ point, draggable, onDragStart, onDrag, onMoveEnd }: RoutePointMarkerProps) {
   const [isHovered, setIsHovered] = useState(false);
   // Leaflet's marker.setIcon() (fired whenever the `icon` prop changes) internally rebuilds the
   // marker's drag interaction from scratch — which, if called while a drag is in progress, ends
@@ -170,6 +178,10 @@ function RoutePointMarker({ point, draggable, onDragStart, onMoveEnd }: RoutePoi
           isDraggingRef.current = true;
           onDragStart();
         },
+        drag: (e: LeafletEvent) => {
+          const { lat, lng } = (e.target as L.Marker).getLatLng();
+          onDrag(lat, lng);
+        },
         dragend: (e: LeafletEvent) => {
           isDraggingRef.current = false;
           const { lat, lng } = (e.target as L.Marker).getLatLng();
@@ -186,6 +198,7 @@ interface AddPointMarkerProps {
   onHoverMarker: () => void;
   onUnhoverMarker: () => void;
   onDragStart: () => void;
+  onDrag: (lat: number, lng: number) => void;
   onCommit: (insertIndex: number, lat: number, lng: number) => void;
 }
 
@@ -202,7 +215,7 @@ interface AddPointMarkerProps {
  * own DOM element, not the line's — the polyline sees that as the pointer leaving it and fires
  * its own mouseout. onHoverMarker/onUnhoverMarker let the parent cancel that clear while the
  * marker itself is being hovered, so it doesn't vanish out from under an incoming click/drag. */
-function AddPointMarker({ hover, draggable, onHoverMarker, onUnhoverMarker, onDragStart, onCommit }: AddPointMarkerProps) {
+function AddPointMarker({ hover, draggable, onHoverMarker, onUnhoverMarker, onDragStart, onDrag, onCommit }: AddPointMarkerProps) {
   const icon = useMemo(() => createAddPointIcon(), []);
   // Same reference-stability fix as RoutePointMarker's position — see its comment for why an
   // inline array literal here would fight an active drag.
@@ -217,6 +230,10 @@ function AddPointMarker({ hover, draggable, onHoverMarker, onUnhoverMarker, onDr
         mouseover: onHoverMarker,
         mouseout: onUnhoverMarker,
         dragstart: onDragStart,
+        drag: (e: LeafletEvent) => {
+          const { lat, lng } = (e.target as L.Marker).getLatLng();
+          onDrag(lat, lng);
+        },
         dragend: (e: LeafletEvent) => {
           const { lat, lng } = (e.target as L.Marker).getLatLng();
           onCommit(hover.insertIndex, lat, lng);
@@ -231,6 +248,7 @@ export function RoutePlannerMapPanel({ plan }: RoutePlannerMapPanelProps) {
   const [initialCenter, setInitialCenter] = useState<LatLng | null>(null);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [hoverInsert, setHoverInsert] = useState<HoverInsertState | null>(null);
+  const [dragPreview, setDragPreview] = useState<DragPreviewState | null>(null);
   const { data: heatmapData } = useHeatmapPoints(showHeatmap);
   // True while ANY marker (an existing route point or the "+" insert marker) is being dragged.
   // Guards two things: (1) the polyline's mouseout clearing/unmounting the "+" marker mid-drag,
@@ -299,6 +317,17 @@ export function RoutePlannerMapPanel({ plan }: RoutePlannerMapPanelProps) {
             }}
           />
         )}
+        {dragPreview && (
+          <Polyline
+            positions={[
+              ...(dragPreview.before ? [[dragPreview.before.lat, dragPreview.before.lng] as [number, number]] : []),
+              [dragPreview.lat, dragPreview.lng],
+              ...(dragPreview.after ? [[dragPreview.after.lat, dragPreview.after.lng] as [number, number]] : []),
+            ]}
+            pathOptions={{ color: ROUTE_COLOR, weight: 4, opacity: 0.7 }}
+            interactive={false}
+          />
+        )}
         {plan.points.map((point, i) => (
           <RoutePointMarker
             key={i}
@@ -308,9 +337,14 @@ export function RoutePlannerMapPanel({ plan }: RoutePlannerMapPanelProps) {
               cancelHoverClear();
               setHoverInsert(null); // hide any lingering "+" marker — it's unrelated to this drag
               isDraggingMarkerRef.current = true;
+              setDragPreview({ lat: point.lat, lng: point.lng, before: plan.points[i - 1] ?? null, after: plan.points[i + 1] ?? null });
+            }}
+            onDrag={(lat, lng) => {
+              setDragPreview({ lat, lng, before: plan.points[i - 1] ?? null, after: plan.points[i + 1] ?? null });
             }}
             onMoveEnd={(lat, lng) => {
               isDraggingMarkerRef.current = false;
+              setDragPreview(null);
               void plan.movePoint(i, lat, lng);
             }}
           />
@@ -325,11 +359,26 @@ export function RoutePlannerMapPanel({ plan }: RoutePlannerMapPanelProps) {
             onDragStart={() => {
               cancelHoverClear();
               isDraggingMarkerRef.current = true;
+              setDragPreview({
+                lat: hoverInsert.lat,
+                lng: hoverInsert.lng,
+                before: plan.points[hoverInsert.insertIndex - 1] ?? null,
+                after: plan.points[hoverInsert.insertIndex] ?? null,
+              });
+            }}
+            onDrag={(lat, lng) => {
+              setDragPreview({
+                lat,
+                lng,
+                before: plan.points[hoverInsert.insertIndex - 1] ?? null,
+                after: plan.points[hoverInsert.insertIndex] ?? null,
+              });
             }}
             onCommit={(insertIndex, lat, lng) => {
               cancelHoverClear();
               isDraggingMarkerRef.current = false;
               setHoverInsert(null);
+              setDragPreview(null);
               void plan.insertPoint(insertIndex, lat, lng);
             }}
           />
