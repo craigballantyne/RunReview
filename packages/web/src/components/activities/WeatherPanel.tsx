@@ -10,7 +10,7 @@ export function WeatherPanel({ runId }: WeatherPanelProps) {
   if (!run?.weather) return null;
 
   return (
-    <div className="absolute bottom-3 left-3 z-[1000] rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-md">
+    <div className="absolute bottom-3 left-3 z-[1000] rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-md transition-shadow hover:shadow-lg">
       <WeatherSummary weather={run.weather} />
     </div>
   );

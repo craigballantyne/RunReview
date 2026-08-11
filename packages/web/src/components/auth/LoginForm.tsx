@@ -42,7 +42,7 @@ export function LoginForm({ onSuccess, onSwitchToSignup, onForgotPassword }: Log
         <input
           id="login-email"
           type="email"
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           {...register("email", { required: "Email is required" })}
         />
         {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
@@ -54,7 +54,7 @@ export function LoginForm({ onSuccess, onSwitchToSignup, onForgotPassword }: Log
         <input
           id="login-password"
           type="password"
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           {...register("password", { required: "Password is required" })}
         />
         {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
@@ -63,20 +63,24 @@ export function LoginForm({ onSuccess, onSwitchToSignup, onForgotPassword }: Log
       <button
         type="button"
         onClick={onForgotPassword}
-        className="text-sm text-gray-500 underline hover:text-gray-700"
+        className="text-sm font-medium text-purple-600 transition-colors hover:text-purple-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 rounded"
       >
         Forgot password?
       </button>
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+        className="w-full rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-purple-700 hover:shadow active:scale-[0.98] active:bg-purple-800 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
       >
         {isSubmitting ? "Logging in…" : "Log in"}
       </button>
       <p className="text-center text-sm text-gray-600">
         Don&apos;t have an account?{" "}
-        <button type="button" onClick={onSwitchToSignup} className="font-medium text-gray-900 underline">
+        <button
+          type="button"
+          onClick={onSwitchToSignup}
+          className="font-medium text-purple-600 transition-colors hover:text-purple-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 rounded"
+        >
           Sign up
         </button>
       </p>

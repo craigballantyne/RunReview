@@ -80,8 +80,8 @@ function ControlButton({
         aria-label={label}
         aria-pressed={isActive}
         onClick={onClick}
-        className={`flex h-8 w-8 items-center justify-center rounded-md ${
-          isActive ? "bg-gray-900 text-white" : "text-gray-500 hover:bg-gray-100"
+        className={`flex h-8 w-8 items-center justify-center rounded-md transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
+          isActive ? "bg-purple-600 text-white shadow-sm" : "text-gray-500 hover:bg-purple-50 hover:text-purple-700"
         }`}
       >
         <span className="h-5 w-5">{icon}</span>

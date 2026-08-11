@@ -12,8 +12,10 @@ export function ActivityCard({ run, isSelected, onSelect }: ActivityCardProps) {
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full rounded-lg border p-4 text-left transition-colors ${
-        isSelected ? "border-gray-900 bg-gray-50" : "border-gray-200 bg-white hover:border-gray-300"
+      className={`w-full rounded-lg border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
+        isSelected
+          ? "border-purple-300 bg-purple-50 shadow-sm ring-1 ring-purple-100"
+          : "border-gray-200 bg-white hover:-translate-y-px hover:border-purple-200 hover:shadow-md"
       }`}
     >
       <h3 className="font-medium text-gray-900">{run.activityName}</h3>

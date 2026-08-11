@@ -27,7 +27,7 @@ export function ConfirmModal({
     // establishes its own stacking context, so a lower z-index here renders visually behind the
     // map wherever they overlap. Matches RunMetricsDrawer's full-viewport overlay precedent.
     <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
         <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
         <div className="mt-2 text-sm text-gray-600">{description}</div>
         {children && <div className="mt-4">{children}</div>}
@@ -35,7 +35,7 @@ export function ConfirmModal({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+            className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 active:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
           >
             Cancel
           </button>
@@ -43,7 +43,7 @@ export function ConfirmModal({
             type="button"
             onClick={onConfirm}
             disabled={isConfirming || confirmDisabled}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-red-700 hover:shadow active:scale-[0.98] active:bg-red-800 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
           >
             {isConfirming ? "Working…" : confirmLabel}
           </button>

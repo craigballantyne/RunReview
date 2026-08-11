@@ -63,7 +63,7 @@ export function RoutePlannerSidebar({ plan }: RoutePlannerSidebarProps) {
             type="button"
             onClick={() => void undo()}
             disabled={!hasMultiplePoints}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
           >
             Undo
           </button>
@@ -71,7 +71,7 @@ export function RoutePlannerSidebar({ plan }: RoutePlannerSidebarProps) {
             type="button"
             onClick={() => void completeLoop()}
             disabled={!hasMultiplePoints}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
           >
             Complete loop
           </button>
@@ -79,7 +79,7 @@ export function RoutePlannerSidebar({ plan }: RoutePlannerSidebarProps) {
         <button
           type="button"
           onClick={() => setShowClearConfirm(true)}
-          className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+          className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
         >
           Clear route
         </button>

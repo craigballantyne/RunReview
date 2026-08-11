@@ -17,7 +17,7 @@ export function ImportSummary({ job, onRetry, onDone }: ImportSummaryProps) {
         <button
           type="button"
           onClick={onRetry}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+          className="rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-purple-700 hover:shadow active:scale-[0.98] active:bg-purple-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
         >
           Try again
         </button>
@@ -38,7 +38,11 @@ export function ImportSummary({ job, onRetry, onDone }: ImportSummaryProps) {
       </p>
       {job.skippedCount > 0 && job.skippedDetails && (
         <div>
-          <button type="button" onClick={() => setExpanded((v) => !v)} className="text-sm text-gray-500 underline">
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="text-sm font-medium text-purple-600 transition-colors hover:text-purple-700 hover:underline"
+          >
             {expanded ? "Hide skipped activities" : "Show skipped activities"}
           </button>
           {expanded && (
@@ -55,7 +59,7 @@ export function ImportSummary({ job, onRetry, onDone }: ImportSummaryProps) {
       <button
         type="button"
         onClick={onDone}
-        className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+        className="rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-purple-700 hover:shadow active:scale-[0.98] active:bg-purple-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
       >
         Done
       </button>

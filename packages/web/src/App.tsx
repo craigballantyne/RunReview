@@ -19,7 +19,7 @@ function VerifiedRoute({ children }: { children: React.ReactNode }) {
 
 export function App() {
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col bg-gray-50">
       <NavBar />
       <main className="min-h-0 flex-1">
         <Routes>

@@ -7,30 +7,30 @@ export function AccountPage() {
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-10 p-8">
+    <div className="mx-auto max-w-2xl space-y-6 p-8">
       <h1 className="text-2xl font-semibold text-gray-900">Account</h1>
 
-      <ImportPanel />
+      <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <ImportPanel />
+      </section>
 
-      <hr className="border-gray-200" />
+      <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <PasswordUpdateForm />
+      </section>
 
-      <PasswordUpdateForm />
-
-      <hr className="border-gray-200" />
-
-      <div className="space-y-3">
+      <section className="space-y-3 rounded-xl border border-red-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">Delete account</h2>
-        <p className="max-w-sm text-sm text-gray-600">
+        <p className="text-sm text-gray-600">
           Permanently delete your account and all associated data. This cannot be undone.
         </p>
         <button
           type="button"
           onClick={() => setShowDeleteAccount(true)}
-          className="rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+          className="rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 active:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
         >
           Delete account
         </button>
-      </div>
+      </section>
 
       {showDeleteAccount && <DeleteAccountModal onClose={() => setShowDeleteAccount(false)} />}
     </div>

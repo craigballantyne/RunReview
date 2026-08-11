@@ -14,7 +14,7 @@ export function ImportProgress({ job }: { job: ImportJobStatusResponse }) {
       </p>
       <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
         <div
-          className="h-full bg-gray-900 transition-all"
+          className="h-full bg-purple-600 transition-all"
           style={{ width: pct !== null ? `${pct}%` : "35%" }}
         />
       </div>

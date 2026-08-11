@@ -45,11 +45,12 @@ export function RunMetricsDrawer({ runId, isOpen, onClose }: RunMetricsDrawerPro
           isOpen ? "translate-y-0" : "translate-y-full"
         }`}
       >
+        <div className="mx-auto mt-2.5 h-1 w-10 shrink-0 rounded-full bg-gray-300" />
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-400 shadow-sm hover:bg-gray-100 hover:text-gray-600"
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-400 shadow-sm transition-all hover:bg-purple-50 hover:text-purple-600 active:scale-95"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="h-5 w-5">
             <path d="M6 6l12 12M18 6L6 18" />

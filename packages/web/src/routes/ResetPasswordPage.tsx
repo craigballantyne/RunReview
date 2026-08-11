@@ -56,7 +56,7 @@ export function ResetPasswordPage() {
           <input
             id="new-password"
             type="password"
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             {...register("newPassword", {
               required: "New password is required",
               minLength: { value: 8, message: "Password must be at least 8 characters" },
@@ -71,7 +71,7 @@ export function ResetPasswordPage() {
           <input
             id="confirm-new-password"
             type="password"
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             {...register("confirmNewPassword", {
               required: "Please confirm your new password",
               validate: (value) => value === watch("newPassword") || "Passwords do not match",
@@ -85,7 +85,7 @@ export function ResetPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+          className="w-full rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-purple-700 hover:shadow active:scale-[0.98] active:bg-purple-800 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
         >
           {isSubmitting ? "Resetting…" : "Reset password"}
         </button>
