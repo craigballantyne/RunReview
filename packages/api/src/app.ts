@@ -7,6 +7,7 @@ import corsPlugin from "./plugins/cors.js";
 import multipartPlugin from "./plugins/multipart.js";
 import rateLimitPlugin from "./plugins/rate-limit.js";
 import importQueuePlugin from "./plugins/import-queue.js";
+import analysisQueuePlugin from "./plugins/analysis-queue.js";
 import sessionPlugin from "./middleware/session.js";
 import { AppError } from "./lib/errors.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
@@ -14,6 +15,7 @@ import { accountRoutes } from "./modules/account/account.routes.js";
 import { runsRoutes } from "./modules/runs/runs.routes.js";
 import { importRoutes } from "./modules/import/import.routes.js";
 import { routePlannerRoutes } from "./modules/route-planner/route-planner.routes.js";
+import { analysisRoutes } from "./modules/analysis/analysis.routes.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const fastify = Fastify({
@@ -55,6 +57,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await fastify.register(multipartPlugin);
   await fastify.register(rateLimitPlugin);
   await fastify.register(importQueuePlugin);
+  await fastify.register(analysisQueuePlugin);
   await fastify.register(sessionPlugin);
 
   await fastify.register(authRoutes, { prefix: "/api/auth" });
@@ -62,6 +65,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await fastify.register(runsRoutes, { prefix: "/api/runs" });
   await fastify.register(importRoutes, { prefix: "/api/import" });
   await fastify.register(routePlannerRoutes, { prefix: "/api/route-planner" });
+  await fastify.register(analysisRoutes, { prefix: "/api/analysis" });
 
   fastify.get("/api/health", async () => ({ status: "ok" }));
 

@@ -21,6 +21,15 @@ enum ImportJobStatus {
   FAILED
 }
 
+/// Per-layer lifecycle for the analysis pipeline. Each layer advances independently so a failed
+/// LLM call in Layer 2 doesn't discard Layer 1's deterministic output.
+enum AnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 enum AuditAction {
   ACCOUNT_CREATED
   ACCOUNT_DELETED
@@ -45,6 +54,8 @@ model User {
   auditLogs     AuditLog[]
   sleeps        Sleep[]
   bodyBatteries BodyBattery[]
+  runInsights   RunInsight[]
+  bestEfforts   RunBestEffort[]
 
   @@map("users")
 }
@@ -110,6 +121,8 @@ model Run {
   splits      Split[]
   hrZones     HrZone[]
   trackPoints TrackPoint[]
+  insight     RunInsight?
+  bestEfforts RunBestEffort[]
 
   @@unique([userId, externalActivityId])
   @@index([userId, startTimeGmt])
@@ -167,6 +180,113 @@ model TrackPoint {
   @@unique([runId, pointIndex])
   @@index([runId])
   @@map("track_points")
+}
+
+/// Analysis output, 1:1 with a run. Cascade-deleted with the run, matching every other run-scoped
+/// table.
+///
+/// The classification columns are `String`, not Postgres enums, even though this schema uses
+/// Prisma enums elsewhere. The vocabulary here is expected to churn while the pipeline is tuned,
+/// and altering a Postgres enum needs a migration for every added value; the authoritative
+/// definitions are the union types in `@run-review/shared`, so enums would also be a second copy
+/// free to drift. `AnalysisStatus` stays an enum because a lifecycle is genuinely stable.
+model RunInsight {
+  id    String @id @default(uuid())
+  runId String @unique @map("run_id")
+
+  /// Denormalized from the run, like `audit_logs.user_email`. Layer 3's comparable-run lookup
+  /// filters by user + classification on every single analysed run, and carrying the user here
+  /// keeps that a single index scan instead of a join.
+  userId String @map("user_id")
+
+  // --- Layer 1: deterministic, no LLM ---
+  layer1Status     AnalysisStatus @default(PENDING) @map("layer1_status")
+  layer1Version    Int?           @map("layer1_version")
+  layer1ComputedAt DateTime?      @map("layer1_computed_at")
+  layer1Error      String?        @map("layer1_error")
+
+  lapMode            String?  @map("lap_mode")
+  lapModeSource      String?  @map("lap_mode_source")
+  runTypeByDistance  String?  @map("run_type_by_distance")
+  hrZone             String?  @map("hr_zone")
+  hrZoneDistribution Json?    @map("hr_zone_distribution")
+  splitPattern       String?  @map("split_pattern")
+  elevationBucket    String?  @map("elevation_bucket")
+  /// Recomputed from smoothed track elevation, not the device's own gain total.
+  elevationGainM     Float?   @map("elevation_gain_m")
+  tempBucket         String?  @map("temp_bucket")
+  humidityFlag       Boolean? @map("humidity_flag")
+  windFlag           Boolean? @map("wind_flag")
+  heatStress         String?  @map("heat_stress")
+  segmentRoles       Json?    @map("segment_roles")
+  rawPointFlags      Json?    @map("raw_point_flags")
+
+  // --- Layer 2: intent parsing + flag adjudication ---
+  layer2Status     AnalysisStatus @default(PENDING) @map("layer2_status")
+  layer2Version    Int?           @map("layer2_version")
+  layer2ComputedAt DateTime?      @map("layer2_computed_at")
+  layer2Error      String?        @map("layer2_error")
+
+  workoutStructure         String?  @map("workout_structure")
+  warmupCooldownDetected   Boolean? @map("warmup_cooldown_detected")
+  walkBreakPattern         Boolean? @map("walk_break_pattern")
+  effortPaceMismatch       String?  @map("effort_pace_mismatch")
+  fadeDetected             Boolean? @map("fade_detected")
+  surgePattern             Boolean? @map("surge_pattern")
+  evenEffortDespiteTerrain Boolean? @map("even_effort_despite_terrain")
+  /// Workout intent parsed from the activity title. Null when the title carries none — titles are
+  /// inconsistent, and an absent intent must stay absent rather than being guessed.
+  parsedIntent             Json?    @map("parsed_intent")
+
+  // --- Layer 3: narrative synthesis ---
+  layer3Status     AnalysisStatus @default(PENDING) @map("layer3_status")
+  layer3Version    Int?           @map("layer3_version")
+  layer3ComputedAt DateTime?      @map("layer3_computed_at")
+  layer3Error      String?        @map("layer3_error")
+  /// Conditionally-present prose fields; the schema omits what isn't warranted for a given run.
+  narrative        Json?          @map("narrative")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  run  Run  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Serves Layer 3's "comparable runs" lookup: same athlete, same session type, same distance band.
+  @@index([userId, workoutStructure, runTypeByDistance])
+  @@index([layer1Status])
+  @@index([layer2Status])
+  @@index([layer3Status])
+  @@map("run_insights")
+}
+
+/// Fastest standard-distance efforts found within a run. Stored whether or not they were a PR —
+/// "21:30 against your 20:45 best" is the baseline material Layer 3 needs, and it only exists if
+/// non-PR efforts are kept.
+model RunBestEffort {
+  id     String @id @default(uuid())
+  runId  String @map("run_id")
+  /// Denormalized alongside `startTimeGmt` so the point-in-time "best before this date" lookup is
+  /// an index scan rather than a join back through runs.
+  userId String @map("user_id")
+
+  distanceM    Int      @map("distance_m")
+  durationSec  Float    @map("duration_sec")
+  /// Where the effort began, in metres from the start of the run.
+  startOffsetM Float    @map("start_offset_m")
+  /// True when this beat everything the athlete had done *before* this run — a point-in-time fact,
+  /// never recomputed against later history.
+  isPr         Boolean  @default(false) @map("is_pr")
+  startTimeGmt DateTime @map("start_time_gmt") @db.Timestamptz(3)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  run  Run  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, distanceM])
+  @@index([userId, distanceM, startTimeGmt])
+  @@map("run_best_efforts")
 }
 
 model Sleep {

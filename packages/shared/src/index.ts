@@ -1,6 +1,7 @@
 export * from "./types/run.js";
 export * from "./types/import.js";
 export * from "./types/auth.js";
+export * from "./types/analysis.js";
 export * from "./lib/pace.js";
 export * from "./lib/grade-adjusted-pace.js";
 export * from "./lib/format-date.js";
