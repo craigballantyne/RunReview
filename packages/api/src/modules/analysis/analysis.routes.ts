@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { requireVerified } from "../../middleware/require-verified.js";
 import { analysisJobIdFor } from "../../queue/analysis-queue.js";
 import { LAYER1_VERSION } from "./layer1.service.js";
+import { LAYER2_VERSION } from "./layer2-llm.js";
 
 export async function analysisRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.addHook("preHandler", requireVerified);
@@ -26,31 +27,46 @@ export async function analysisRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get("/", async (req, reply) => {
     const userId = req.user!.id;
 
-    const [totalRuns, byStatus, staleCount] = await Promise.all([
+    const [totalRuns, byLayer1, staleLayer1, byLayer2, awaitingIntent] = await Promise.all([
       fastify.prisma.run.count({ where: { userId } }),
-      fastify.prisma.runInsight.groupBy({
-        by: ["layer1Status"],
-        where: { userId },
-        _count: { _all: true },
-      }),
+      fastify.prisma.runInsight.groupBy({ by: ["layer1Status"], where: { userId }, _count: { _all: true } }),
       fastify.prisma.runInsight.count({
         where: { userId, layer1Status: "COMPLETED", layer1Version: { lt: LAYER1_VERSION } },
       }),
+      fastify.prisma.runInsight.groupBy({ by: ["layer2Status"], where: { userId }, _count: { _all: true } }),
+      // Tags stored, intent never attempted — the shape a pass takes with no API key configured.
+      fastify.prisma.runInsight.count({
+        where: { userId, layer2Status: "COMPLETED", layer2Version: null },
+      }),
     ]);
 
-    const counts = Object.fromEntries(byStatus.map((row) => [row.layer1Status, row._count._all]));
-    const analysed = counts.COMPLETED ?? 0;
+    const layer1Counts = Object.fromEntries(byLayer1.map((row) => [row.layer1Status, row._count._all]));
+    const layer2Counts = Object.fromEntries(byLayer2.map((row) => [row.layer2Status, row._count._all]));
+    const layer1Analysed = layer1Counts.COMPLETED ?? 0;
+    const layer2Analysed = layer2Counts.COMPLETED ?? 0;
 
     reply.send({
       layer1: {
         version: LAYER1_VERSION,
         totalRuns,
-        analysed,
+        analysed: layer1Analysed,
         // Runs with no insight row at all have never been picked up, and count as pending too.
-        pending: totalRuns - analysed - (counts.FAILED ?? 0),
-        failed: counts.FAILED ?? 0,
+        pending: totalRuns - layer1Analysed - (layer1Counts.FAILED ?? 0),
+        failed: layer1Counts.FAILED ?? 0,
         // Analysed against an older version of the computations; a pass will redo these.
-        stale: staleCount,
+        stale: staleLayer1,
+      },
+      layer2: {
+        version: LAYER2_VERSION,
+        analysed: layer2Analysed,
+        pending: totalRuns - layer2Analysed - (layer2Counts.FAILED ?? 0),
+        failed: layer2Counts.FAILED ?? 0,
+        /**
+         * Deterministic tags stored, workout intent not parsed. Reported separately from `pending`
+         * because these runs are usefully analysed — they are only waiting on an API key, and a
+         * later pass will complete them without redoing the tags.
+         */
+        awaitingIntent,
       },
     });
   });

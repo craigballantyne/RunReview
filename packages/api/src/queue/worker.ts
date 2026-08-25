@@ -8,6 +8,8 @@ import { createHealthMetricsService } from "../modules/import/health-metrics.ser
 import { createImportService } from "../modules/import/import.service.js";
 import { createWeatherService } from "../modules/import/weather.js";
 import { createLayer1Service } from "../modules/analysis/layer1.service.js";
+import { createLayer2Service } from "../modules/analysis/layer2.service.js";
+import { createLayer2LlmClient } from "../modules/analysis/layer2-llm.js";
 import { createRedisConnection } from "./connection.js";
 import { IMPORT_QUEUE_NAME, type ImportJobData } from "./import-queue.js";
 import { ANALYSIS_QUEUE_NAME, type AnalysisJobData } from "./analysis-queue.js";
@@ -54,13 +56,17 @@ async function main() {
   // sharing the import worker's.
   const analysisConnection = createRedisConnection(env);
   const layer1 = createLayer1Service(prisma, logger);
+  // The client is inert without a key: intent parsing is skipped per run rather than failing the
+  // pass, so the deterministic tags still land.
+  const layer2 = createLayer2Service(prisma, createLayer2LlmClient(env.ANTHROPIC_API_KEY), logger);
 
   const analysisWorker = new Worker<AnalysisJobData>(
     ANALYSIS_QUEUE_NAME,
     async (job) => {
-      logger.info({ userId: job.data.userId }, "starting layer 1 analysis pass");
-      const result = await layer1.analyseUser(job.data.userId);
-      return result;
+      logger.info({ userId: job.data.userId }, "starting analysis pass");
+      const layer1Result = await layer1.analyseUser(job.data.userId);
+      const layer2Result = await layer2.analyseUser(job.data.userId);
+      return { layer1: layer1Result, layer2: layer2Result };
     },
     { connection: analysisConnection, concurrency: ANALYSIS_CONCURRENCY },
   );

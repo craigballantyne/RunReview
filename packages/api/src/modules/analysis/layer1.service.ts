@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import type { HrZone, Split, TrackPoint } from "@run-review/shared";
 import { detectBestEfforts, markPersonalRecords } from "./best-efforts.js";
 import { buildDistanceChannel } from "./distance-channel.js";
@@ -9,6 +9,7 @@ import { detectRawPointFlags } from "./raw-point-flags.js";
 import { classifyRunTypeByDistance, ROLLING_WINDOW_DAYS } from "./run-type.js";
 import { classifySegmentRoles } from "./segment-roles.js";
 import { classifySplitPattern } from "./split-pattern.js";
+import { toJson } from "./prisma-json.js";
 import { computeWeatherFlags } from "./weather-flags.js";
 
 /**
@@ -28,15 +29,6 @@ interface Layer1Logger {
 
 const NOOP_LOGGER: Layer1Logger = { info: () => {}, warn: () => {}, error: () => {} };
 
-/**
- * Prisma's `InputJsonValue` requires an index signature, which `interface` declarations don't
- * carry (unlike `Record`/type aliases). Everything passed through here is plain serialisable data
- * defined in `@run-review/shared`, so the assertion is safe — kept in one place rather than
- * repeated at each call site.
- */
-function toJson(value: unknown): Prisma.InputJsonValue {
-  return value as Prisma.InputJsonValue;
-}
 
 /** Prisma rows carry `Date` and `BigInt` where the shared analysis types expect `string`. */
 function toSharedSplit(row: {

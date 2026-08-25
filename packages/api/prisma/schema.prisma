@@ -234,8 +234,14 @@ model RunInsight {
   fadeDetected             Boolean? @map("fade_detected")
   surgePattern             Boolean? @map("surge_pattern")
   evenEffortDespiteTerrain Boolean? @map("even_effort_despite_terrain")
+  /// Numbers behind whichever flags fired — the specifics Layer 3 cites instead of asserting that
+  /// a run "faded". A flag that didn't fire carries no entry.
+  layer2Evidence           Json?    @map("layer2_evidence")
   /// Workout intent parsed from the activity title. Null when the title carries none — titles are
   /// inconsistent, and an absent intent must stay absent rather than being guessed.
+  ///
+  /// Also null when intent parsing was skipped for want of an API key. `layer2Version` is left
+  /// unset in that case, so a later pass picks the run up rather than treating it as done.
   parsedIntent             Json?    @map("parsed_intent")
 
   // --- Layer 3: narrative synthesis ---
