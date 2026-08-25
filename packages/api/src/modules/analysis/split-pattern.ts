@@ -1,5 +1,6 @@
 import type { LapMode, SplitPattern } from "@run-review/shared";
 import type { DistanceChannel } from "./distance-channel.js";
+import { linearSlope, mean } from "./stats.js";
 
 /**
  * Equal-distance bins the run is reduced to before fitting. Regressing raw 2-second points would
@@ -68,24 +69,17 @@ export function classifySplitPattern(channel: DistanceChannel, lapMode: LapMode)
   const bins = buildBins(channel);
   if (bins.length < 3) return "not_applicable";
 
-  const n = bins.length;
-  const meanX = bins.reduce((s, b) => s + b.centreM, 0) / n;
-  const meanY = bins.reduce((s, b) => s + b.paceSecPerKm, 0) / n;
-
-  let num = 0;
-  let den = 0;
-  for (const bin of bins) {
-    const dx = bin.centreM - meanX;
-    num += dx * (bin.paceSecPerKm - meanY);
-    den += dx * dx;
-  }
-  if (den === 0 || meanY <= 0) return "not_applicable";
+  const meanPace = mean(bins.map((b) => b.paceSecPerKm));
+  if (meanPace <= 0) return "not_applicable";
 
   // Slope is sec/km of pace change per metre travelled; scaling by the run's length turns it into
   // the total pace drift implied from first metre to last, which is the thing worth thresholding.
+  const slope = linearSlope(
+    bins.map((b) => b.centreM),
+    bins.map((b) => b.paceSecPerKm),
+  );
   const totalM = channel.cumulativeM[channel.cumulativeM.length - 1]!;
-  const impliedChange = (num / den) * totalM;
-  const relative = impliedChange / meanY;
+  const relative = (slope * totalM) / meanPace;
 
   if (relative > EVEN_BAND) return "positive_split";
   if (relative < -EVEN_BAND) return "negative_split";

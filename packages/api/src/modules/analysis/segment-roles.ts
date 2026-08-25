@@ -1,4 +1,5 @@
 import type { LapMode, SegmentClassification, SegmentRole, Split } from "@run-review/shared";
+import { median } from "./stats.js";
 
 /**
  * How much faster than the session median a lap must be to read as a rep.
@@ -23,13 +24,6 @@ const RECOVERY_MARGIN = 0.25;
 
 /** How much slower than the median a leading/trailing lap must be to read as warmup or cooldown. */
 const AUTO_END_MARGIN = 0.1;
-
-function median(values: number[]): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
-}
 
 function paceSecPerKm(split: Split): number {
   return split.distanceM > 0 ? split.durationSec / (split.distanceM / 1000) : Number.POSITIVE_INFINITY;

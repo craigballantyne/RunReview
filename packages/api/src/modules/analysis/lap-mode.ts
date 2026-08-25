@@ -1,4 +1,5 @@
 import type { LapMode, LapModeSource, Split } from "@run-review/shared";
+import { mean, median, pearson } from "./stats.js";
 
 /** Garmin auto-lap distance. Tolerance covers float representation, not genuine variation. */
 const AUTO_LAP_DISTANCE_M = 1000;
@@ -47,33 +48,6 @@ export interface LapModeResult {
   lapModeSource: LapModeSource | null;
 }
 
-function pearson(xs: number[], ys: number[]): number {
-  const n = Math.min(xs.length, ys.length);
-  if (n < 2) return 0;
-  const meanX = xs.slice(0, n).reduce((s, v) => s + v, 0) / n;
-  const meanY = ys.slice(0, n).reduce((s, v) => s + v, 0) / n;
-
-  let num = 0;
-  let sumSqX = 0;
-  let sumSqY = 0;
-  for (let i = 0; i < n; i++) {
-    const dx = xs[i]! - meanX;
-    const dy = ys[i]! - meanY;
-    num += dx * dy;
-    sumSqX += dx * dx;
-    sumSqY += dy * dy;
-  }
-  const denom = Math.sqrt(sumSqX * sumSqY);
-  return denom === 0 ? 0 : num / denom;
-}
-
-function medianOf(values: number[]): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
-}
-
 /**
  * Laps excluding the trailing remainder. Every run ends on a partial lap (67.3m, 49.7m, 291.7m in
  * the reference runs), which would otherwise fail the all-1000m test on every single run.
@@ -101,7 +75,7 @@ function hasProgrammedPaceAlternation(laps: Split[]): boolean {
     changes.push((paces[i + 1]! - paces[i]!) / paces[i]!);
   }
 
-  if (medianOf(changes.map(Math.abs)) <= PACE_ALTERNATION_THRESHOLD) return false;
+  if (median(changes.map(Math.abs)) <= PACE_ALTERNATION_THRESHOLD) return false;
 
   // Alternation is what separates reps from a progression run — both swing, but a progression
   // drifts monotonically while reps oscillate.
@@ -130,7 +104,7 @@ function hasProgrammedPaceAlternation(laps: Split[]): boolean {
  * declines rather than guessing.
  */
 function hasRepHeartRateSignature(laps: Split[], paces: number[]): boolean {
-  const medianPace = medianOf(paces);
+  const medianPace = median(paces);
   const fast: number[] = [];
   const slow: number[] = [];
 
@@ -141,7 +115,6 @@ function hasRepHeartRateSignature(laps: Split[], paces: number[]): boolean {
   }
   if (fast.length === 0 || slow.length === 0) return false;
 
-  const mean = (values: number[]) => values.reduce((s, v) => s + v, 0) / values.length;
   return mean(fast) - mean(slow) >= MIN_REP_HR_SEPARATION_BPM;
 }
 

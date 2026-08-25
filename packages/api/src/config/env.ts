@@ -12,6 +12,10 @@ const envSchema = z.object({
   API_BASE_URL: z.string().url(),
   NOMINATIM_USER_AGENT: z.string().min(1),
   OPENROUTESERVICE_API_KEY: z.string().min(1),
+  // Optional, unlike the other API keys: analysis is a background job, so an unset key should fail
+  // that job with a clear message rather than stop the whole API from booting. Local development
+  // and CI don't need it, and there's no silent-degradation risk — a FAILED insight row is visible.
+  ANTHROPIC_API_KEY: z.string().min(1).optional(),
   IMPORT_UPLOAD_DIR: z.string().min(1),
   IMPORT_MAX_FILE_SIZE_BYTES: z.coerce.number().int().positive().default(268_435_456),
   PORT: z.coerce.number().int().positive().default(3000),

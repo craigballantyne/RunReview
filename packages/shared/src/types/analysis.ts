@@ -89,6 +89,91 @@ export interface BestEffort {
   startOffsetM: number;
 }
 
+/**
+ * Shape the session actually took, derived entirely from the run's own data.
+ *
+ * This describes what happened, never what was planned. A run set out as easy but executed at
+ * tempo effort is `steady`, not `easy` — the gap between the two is the interesting part, and
+ * Layer 3 reports it by comparing this against `ParsedIntent`.
+ *
+ * `easy` is therefore not produced here at all: separating easy from steady needs to know what
+ * easy *is* for this athlete, which is a baseline question rather than a within-run one. It waits
+ * for Layer 3.
+ *
+ * Race-ness is not a shape and lives on `ParsedIntent.isRace` instead — a race can be run as a
+ * steady effort or as a progression, and those are the structures worth recording.
+ */
+export type WorkoutStructure = "easy" | "steady" | "intervals" | "progression" | "fartlek" | "mixed" | "unclear";
+
+/** Effort level a workout title says was planned. */
+export type PlannedIntensity = "easy" | "moderate" | "hard" | "unclear";
+
+/**
+ * What the athlete set out to do, read from the activity title alone.
+ *
+ * Kept strictly separate from the observed tags and never reconciled against them. Recording the
+ * plan faithfully — including when it plainly wasn't executed — is what lets Layer 3 say "you
+ * pushed too hard on this easy run" rather than silently relabelling the run.
+ */
+export interface ParsedIntent {
+  /** The workout as the title describes it. Null when the title names no workout. */
+  statedWorkout: string | null;
+  plannedStructure: WorkoutStructure | null;
+  plannedIntensity: PlannedIntensity | null;
+  /** Training-plan week where the title encodes one ("W3 Fri Tempo" is 3). */
+  planWeek: number | null;
+  /** True only for an actual event, not a hard training effort described as a time trial. */
+  isRace: boolean;
+}
+
+/**
+ * Relationship between cardiac cost and pace produced, measured within this run only — never
+ * against history, which is Layer 3's job. `not_applicable` when HR data isn't usable.
+ */
+export type EffortPaceMismatch = "hr_high_pace_low" | "hr_low_pace_high" | "consistent" | "not_applicable";
+
+/**
+ * Numbers behind whichever flags fired, carried forward so Layer 3 can cite specifics rather than
+ * asserting that something "faded". A flag that didn't fire has no entry.
+ *
+ * This is the "flag in 2, explain in 3" split: Layer 2 reports the raw signal and the conditions
+ * that coincided with it, and makes no attempt to decide whether terrain or weather excuses it.
+ */
+export interface Layer2Evidence {
+  fade?: {
+    paceDriftSecPerKm: number;
+    hrDriftBpm: number | null;
+    /** Climb within the fading portion — the most common innocent explanation. */
+    elevationGainM: number | null;
+  };
+  surge?: {
+    count: number;
+    fastestPaceSecPerKm: number;
+    medianPaceSecPerKm: number;
+  };
+  effortPaceMismatch?: {
+    firstHalfPaceSecPerKm: number;
+    secondHalfPaceSecPerKm: number;
+    firstHalfHrBpm: number;
+    secondHalfHrBpm: number;
+  };
+  evenEffortDespiteTerrain?: {
+    paceElevationCorrelation: number;
+    hrCoefficientOfVariation: number;
+  };
+}
+
+export interface Layer2Tags {
+  workoutStructure: WorkoutStructure;
+  warmupCooldownDetected: boolean;
+  walkBreakPattern: boolean;
+  effortPaceMismatch: EffortPaceMismatch;
+  fadeDetected: boolean;
+  surgePattern: boolean;
+  evenEffortDespiteTerrain: boolean;
+  evidence: Layer2Evidence;
+}
+
 export interface WeatherFlags {
   tempBucket: TempBucket | null;
   /**
