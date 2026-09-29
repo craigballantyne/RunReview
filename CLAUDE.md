@@ -39,6 +39,15 @@ See `README.md` for the actual setup commands. Short version: `docker compose up
 - **Route gradient visualization** (`lib/route-gradient.ts`): pace/heart-rate/elevation modes each render as many small 2-point `Polyline` segments rather than one path, since Leaflet can't gradient-fill a single line. Colors are single-hue ramps normalized to that run's own min/max, not a fixed global scale.
 - **The "All metrics" drawer is portal-rendered to `document.body`** (`RunMetricsDrawer.tsx`), not nested in the map panel's DOM position — it needs to visually cover both the activity list and map columns, which live in sibling components.
 - **Docker footguns already hit and fixed** (see `packages/api/Dockerfile`): missing `.dockerignore` let the host's macOS-built Prisma engine leak into the Linux image; `prisma generate` has to run explicitly in the `dev` stage too, not just `build`; plain `node:20-alpine` ships no OpenSSL at all, which breaks Prisma's engine-detection — `apk add openssl` is required before `npm install`. The `web` container's Vite dev-server proxy needs `API_BASE_URL` overridden to `http://api:3000` (the Docker network hostname) specifically for that service in `docker-compose.yml` — `.env`'s `API_BASE_URL` has to stay `http://localhost:3000` for verification-email links to resolve in an actual browser, so it can't just be changed globally.
+- **Adding an npm dependency needs the `api_node_modules` volume deleted, not just a rebuild.** `docker-compose.yml` mounts the named volume `api_node_modules` over `/workspace/node_modules` for both `api` and `worker`, which *shadows* the `node_modules` baked into the image and survives `docker compose build`. Installing a package on the host updates `package.json` and the host's tree, but the containers keep serving the dependency set from whenever that volume was first populated, so they crash-loop on `ERR_MODULE_NOT_FOUND` for the new import. Containers must be **removed**, not merely stopped, before the volume will release:
+
+  ```sh
+  docker compose rm -f api worker
+  docker volume rm runreview_api_node_modules   # NOT runreview_postgres_data
+  docker compose up -d api worker               # repopulates from the image
+  ```
+
+  The symptom points away from the cause: `docker compose ps` shows the service as `Up` because it's restarting, while every request fails with `connection reset by peer` rather than `connection refused`. Check `docker compose logs api` first. Host-side `npm test`/`typecheck` pass throughout, because they never touch the container — so exercise the running app after any dependency change, not just the test suite.
 
 ## Testing
 
