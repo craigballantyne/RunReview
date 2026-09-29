@@ -1,3 +1,5 @@
+import type { LapMode, SegmentClassification, WorkoutStructure } from "./analysis.js";
+
 export interface RunListItem {
   id: string;
   activityName: string;
@@ -53,6 +55,32 @@ export interface RunWeather {
   windDirectionDeg: number | null;
 }
 
+/**
+ * A standard-distance best effort found within this run.
+ *
+ * `isPr` and `isCurrentBest` are different questions and both are worth having. `isPr` is stored
+ * point-in-time — it records whether the effort beat everything that came before it, and never
+ * changes. `isCurrentBest` is evaluated against the athlete's whole history at read time, so it
+ * answers "is this still my fastest?" — which is what a trophy should mean.
+ */
+export interface RunBestEffort {
+  distanceM: number;
+  label: string;
+  durationSec: number;
+  /** Where the effort began, in metres from the start of the run. */
+  startOffsetM: number;
+  isPr: boolean;
+  isCurrentBest: boolean;
+}
+
+/** Analysis output surfaced alongside a run. Null when the run has not been analysed yet. */
+export interface RunInsight {
+  workoutStructure: WorkoutStructure | null;
+  lapMode: LapMode | null;
+  /** One entry per lap, in order, with its role within the session. */
+  segments: SegmentClassification[];
+}
+
 export interface RunDetail extends RunListItem {
   externalActivityId: string;
   startTimeGmt: string;
@@ -72,6 +100,9 @@ export interface RunDetail extends RunListItem {
   splits: Split[];
   hrZones: HrZone[];
   trackPoints: TrackPoint[];
+  insight: RunInsight | null;
+  /** Ascending by distance. Empty when the run covers no standard distance, or is unanalysed. */
+  bestEfforts: RunBestEffort[];
 }
 
 export interface AccountSummary {

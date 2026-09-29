@@ -1,20 +1,13 @@
-import type { BestEffort } from "@run-review/shared";
+import { STANDARD_DISTANCES_M, type BestEffort } from "@run-review/shared";
 import type { DistanceChannel } from "./distance-channel.js";
-
-/**
- * Standard distances searched for within every run, in metres. Rounded to integers so they work
- * as a stable storage key — the mile is 1609.34m and the half 21097.5m, but sub-metre precision
- * is meaningless against GPS distance error and makes for an awkward database column.
- */
-export const STANDARD_DISTANCES_M = [1000, 1609, 5000, 10000, 15000, 21097, 42195] as const;
 
 /**
  * Fastest continuous window covering `targetM`, found anywhere in the run.
  *
  * Two-pointer over the cumulative distance channel, so each distance costs one linear pass rather
  * than the naive nested scan. This is why best-effort detection stays an always-on part of Layer 1
- * instead of the on-demand job the original spec assumed it would have to be: seven distances over
- * ~1800 points is a few thousand operations.
+ * instead of the on-demand job the original spec assumed it would have to be: a dozen distances
+ * over ~1800 points is a few thousand operations.
  *
  * The window end is interpolated between bracketing points so the effort covers exactly the target
  * distance, rather than whatever overshoot the next recorded point happens to land on.

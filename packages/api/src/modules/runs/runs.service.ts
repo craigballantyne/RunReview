@@ -1,5 +1,13 @@
 import type { PrismaClient } from "@prisma/client";
-import type { RunDetail, RunListItem, RunListPage } from "@run-review/shared";
+import {
+  standardDistanceLabel,
+  type RunBestEffort,
+  type RunDetail,
+  type RunInsight,
+  type RunListItem,
+  type RunListPage,
+  type SegmentClassification,
+} from "@run-review/shared";
 import { NotFoundError, ValidationError } from "../../lib/errors.js";
 import { recordAuditLog } from "../audit/audit.service.js";
 
@@ -88,12 +96,47 @@ export function createRunsService({ prisma }: RunsServiceDeps) {
           hrZones: { orderBy: { zoneNumber: "asc" } },
           trackPoints: { orderBy: { pointIndex: "asc" } },
           weather: true,
+          insight: true,
+          bestEfforts: { orderBy: { distanceM: "asc" } },
         },
       });
 
       if (!run) {
         throw new NotFoundError("Run not found");
       }
+
+      // The athlete's fastest at each distance across their whole history. `isPr` on the stored row
+      // is point-in-time — it says the effort beat everything *before* it, which stays true even
+      // after a later run takes the record. A trophy should mean "still your fastest", so that has
+      // to be decided here rather than read off the row.
+      const currentBests = new Map<number, number>();
+      if (run.bestEfforts.length > 0) {
+        const grouped = await prisma.runBestEffort.groupBy({
+          by: ["distanceM"],
+          where: { userId, distanceM: { in: run.bestEfforts.map((e) => e.distanceM) } },
+          _min: { durationSec: true },
+        });
+        for (const row of grouped) {
+          if (row._min.durationSec !== null) currentBests.set(row.distanceM, row._min.durationSec);
+        }
+      }
+
+      const insight: RunInsight | null = run.insight
+        ? {
+            workoutStructure: run.insight.workoutStructure as RunInsight["workoutStructure"],
+            lapMode: run.insight.lapMode as RunInsight["lapMode"],
+            segments: (run.insight.segmentRoles ?? []) as unknown as SegmentClassification[],
+          }
+        : null;
+
+      const bestEfforts: RunBestEffort[] = run.bestEfforts.map((e) => ({
+        distanceM: e.distanceM,
+        label: standardDistanceLabel(e.distanceM),
+        durationSec: e.durationSec,
+        startOffsetM: e.startOffsetM,
+        isPr: e.isPr,
+        isCurrentBest: currentBests.get(e.distanceM) === e.durationSec,
+      }));
 
       return {
         id: run.id,
@@ -138,6 +181,8 @@ export function createRunsService({ prisma }: RunsServiceDeps) {
           elevationGainM: s.elevationGainM,
           elevationLossM: s.elevationLossM,
         })),
+        insight,
+        bestEfforts,
         hrZones: run.hrZones.map((z) => ({
           id: z.id,
           zoneNumber: z.zoneNumber,

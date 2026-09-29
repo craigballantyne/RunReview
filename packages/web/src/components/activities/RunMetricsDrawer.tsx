@@ -1,13 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { formatActivityDate, formatDistanceKm, formatDuration, formatPace } from "@run-review/shared";
 import { useRunDetail } from "../../api/useRuns.js";
 import { StatRow } from "./charts/StatRow.js";
 import { WeatherSummary } from "./WeatherSummary.js";
-import { PaceSection } from "./charts/PaceSection.js";
-import { HeartRateSection } from "./charts/HeartRateSection.js";
-import { HeartRateZonesSection } from "./charts/HeartRateZonesSection.js";
-import { ElevationSection } from "./charts/ElevationSection.js";
+import { SegmentsTab } from "./tabs/SegmentsTab.js";
+import { MetricsTab } from "./tabs/MetricsTab.js";
+import { BestEffortsTab } from "./tabs/BestEffortsTab.js";
+
+const TABS = [
+  { id: "segments", label: "Segments" },
+  { id: "metrics", label: "Metrics" },
+  { id: "best-efforts", label: "Best efforts" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
 
 interface RunMetricsDrawerProps {
   runId: string | null;
@@ -17,6 +24,7 @@ interface RunMetricsDrawerProps {
 
 export function RunMetricsDrawer({ runId, isOpen, onClose }: RunMetricsDrawerProps) {
   const { data: run } = useRunDetail(runId);
+  const [activeTab, setActiveTab] = useState<TabId>("segments");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -26,6 +34,12 @@ export function RunMetricsDrawer({ runId, isOpen, onClose }: RunMetricsDrawerPro
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
+
+  // Opening a different run should start on the default tab rather than wherever the last run was
+  // left — the tab that was useful for an interval session usually isn't for the next easy run.
+  useEffect(() => {
+    setActiveTab("segments");
+  }, [runId]);
 
   if (!runId) return null;
 
@@ -83,11 +97,41 @@ export function RunMetricsDrawer({ runId, isOpen, onClose }: RunMetricsDrawerPro
               />
             </div>
 
-            <div className="mt-8 space-y-8">
-              <PaceSection run={run} />
-              <HeartRateSection run={run} />
-              <HeartRateZonesSection run={run} />
-              <ElevationSection run={run} />
+            <div className="mt-6 border-b border-gray-200">
+              <div role="tablist" aria-label="Run detail sections" className="-mb-px flex gap-1">
+                {TABS.map((tab) => {
+                  const isActive = tab.id === activeTab;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      id={`run-tab-${tab.id}`}
+                      aria-selected={isActive}
+                      aria-controls={`run-tabpanel-${tab.id}`}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "border-purple-600 text-purple-700"
+                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div
+              role="tabpanel"
+              id={`run-tabpanel-${activeTab}`}
+              aria-labelledby={`run-tab-${activeTab}`}
+              className="mt-5"
+            >
+              {activeTab === "segments" && <SegmentsTab run={run} />}
+              {activeTab === "metrics" && <MetricsTab run={run} />}
+              {activeTab === "best-efforts" && <BestEffortsTab run={run} />}
             </div>
           </div>
         )}

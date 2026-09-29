@@ -17,7 +17,7 @@ import { computeWeatherFlags } from "./weather-flags.js";
  * the same run. Rows below the current version are re-analysed; rows at it are left alone, so a
  * re-run is idempotent and cheap.
  */
-export const LAYER1_VERSION = 2;
+export const LAYER1_VERSION = 3;
 
 const MS_PER_DAY = 86_400_000;
 

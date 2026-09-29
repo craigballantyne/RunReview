@@ -1,6 +1,7 @@
 import type { TrackPoint } from "@run-review/shared";
 import { describe, expect, it } from "vitest";
-import { detectBestEfforts, markPersonalRecords, STANDARD_DISTANCES_M } from "../../src/modules/analysis/best-efforts.js";
+import { STANDARD_DISTANCES, STANDARD_DISTANCES_M } from "@run-review/shared";
+import { detectBestEfforts, markPersonalRecords } from "../../src/modules/analysis/best-efforts.js";
 import { buildDistanceChannel } from "../../src/modules/analysis/distance-channel.js";
 
 /** A 1s-cadence track whose speed at each second comes from `speedAt`. */
@@ -25,7 +26,7 @@ describe("detectBestEfforts", () => {
   it("finds only the distances the run actually covers", () => {
     // 3000m run: the 1k and the mile fit, nothing longer does.
     const efforts = detectBestEfforts(channelAtConstantSpeed(1000, 3));
-    expect(efforts.map((e) => e.distanceM)).toEqual([1000, 1609]);
+    expect(efforts.map((e) => e.distanceM)).toEqual([1000, 1609, 2000]);
   });
 
   it("measures a constant-pace effort accurately", () => {
@@ -72,8 +73,17 @@ describe("detectBestEfforts", () => {
     expect(detectBestEfforts(buildDistanceChannel([], 0))).toEqual([]);
   });
 
-  it("covers the documented standard distances", () => {
-    expect(STANDARD_DISTANCES_M).toEqual([1000, 1609, 5000, 10000, 15000, 21097, 42195]);
+  it("searches the full standard-distance ladder, ascending", () => {
+    expect([...STANDARD_DISTANCES_M]).toEqual([...STANDARD_DISTANCES_M].sort((a, b) => a - b));
+    expect(STANDARD_DISTANCES_M).toContain(1000);
+    expect(STANDARD_DISTANCES_M).toContain(16093); // 10 miles
+    expect(STANDARD_DISTANCES_M).toContain(42195); // marathon
+  });
+
+  it("labels every distance it searches", () => {
+    // The UI renders these, so a distance with no label would surface as raw metres.
+    expect(STANDARD_DISTANCES.every((d) => d.label.length > 0)).toBe(true);
+    expect(STANDARD_DISTANCES).toHaveLength(STANDARD_DISTANCES_M.length);
   });
 });
 
