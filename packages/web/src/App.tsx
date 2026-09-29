@@ -7,6 +7,7 @@ import { ActivityPage } from "./routes/ActivityPage.js";
 import { AccountPage } from "./routes/AccountPage.js";
 import { ResetPasswordPage } from "./routes/ResetPasswordPage.js";
 import { RoutePlannerPage } from "./routes/RoutePlannerPage.js";
+import { RecordsPage } from "./routes/RecordsPage.js";
 
 /** Requires a logged-in, verified account — redirects to "/" otherwise, where LandingPage
  * shows the appropriate unverified/logged-out state. */
@@ -46,6 +47,14 @@ export function App() {
             element={
               <VerifiedRoute>
                 <AccountPage />
+              </VerifiedRoute>
+            }
+          />
+          <Route
+            path="/records"
+            element={
+              <VerifiedRoute>
+                <RecordsPage />
               </VerifiedRoute>
             }
           />

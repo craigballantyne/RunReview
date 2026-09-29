@@ -1,3 +1,5 @@
+import type { DistanceCategory } from "../lib/standard-distances.js";
+
 /**
  * Layer 1 analysis vocabulary — see `Project spec/RunAnalysisImplementation.md`.
  *
@@ -184,4 +186,21 @@ export interface WeatherFlags {
   humidityFlag: boolean;
   windFlag: boolean;
   heatStress: HeatStress | null;
+}
+
+/** One of an athlete's fastest efforts at a standard distance, for the records page. */
+export interface DistanceRecordEntry {
+  runId: string;
+  activityName: string;
+  durationSec: number;
+  /** Local time, so the date shown matches the day the athlete actually ran. */
+  startTimeLocal: string;
+}
+
+export interface DistanceRecord {
+  distanceM: number;
+  label: string;
+  category: DistanceCategory;
+  /** Fastest first, at most three. Distances the athlete has never covered are omitted entirely. */
+  entries: DistanceRecordEntry[];
 }

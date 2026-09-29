@@ -1,3 +1,9 @@
+/**
+ * Grouping used by the records page. `race` separates the two classic race distances from the
+ * training ladder — they belong together regardless of which measurement system they came from.
+ */
+export type DistanceCategory = "km" | "mi" | "race";
+
 export interface StandardDistance {
   /**
    * Metres, rounded to an integer. Sub-metre precision is meaningless against GPS distance error
@@ -5,6 +11,7 @@ export interface StandardDistance {
    */
   distanceM: number;
   label: string;
+  category: DistanceCategory;
 }
 
 /**
@@ -15,21 +22,25 @@ export interface StandardDistance {
  * than as two separate systems.
  */
 export const STANDARD_DISTANCES: readonly StandardDistance[] = [
-  { distanceM: 1000, label: "1 km" },
-  { distanceM: 1609, label: "1 mile" },
-  { distanceM: 2000, label: "2 km" },
-  { distanceM: 3219, label: "2 miles" },
-  { distanceM: 5000, label: "5 km" },
-  { distanceM: 8047, label: "5 miles" },
-  { distanceM: 10000, label: "10 km" },
-  { distanceM: 15000, label: "15 km" },
-  { distanceM: 16093, label: "10 miles" },
-  { distanceM: 20000, label: "20 km" },
-  { distanceM: 21097, label: "Half marathon" },
-  { distanceM: 42195, label: "Marathon" },
+  { distanceM: 1000, label: "1 km", category: "km" },
+  { distanceM: 1609, label: "1 mile", category: "mi" },
+  { distanceM: 2000, label: "2 km", category: "km" },
+  { distanceM: 3219, label: "2 miles", category: "mi" },
+  { distanceM: 5000, label: "5 km", category: "km" },
+  { distanceM: 8047, label: "5 miles", category: "mi" },
+  { distanceM: 10000, label: "10 km", category: "km" },
+  { distanceM: 15000, label: "15 km", category: "km" },
+  { distanceM: 16093, label: "10 miles", category: "mi" },
+  { distanceM: 20000, label: "20 km", category: "km" },
+  { distanceM: 21097, label: "Half marathon", category: "race" },
+  { distanceM: 42195, label: "Marathon", category: "race" },
 ];
 
 export const STANDARD_DISTANCES_M: readonly number[] = STANDARD_DISTANCES.map((d) => d.distanceM);
+
+export function standardDistancesIn(category: DistanceCategory): readonly StandardDistance[] {
+  return STANDARD_DISTANCES.filter((d) => d.category === category);
+}
 
 /** Falls back to a plain kilometre reading for a distance that isn't in the standard ladder. */
 export function standardDistanceLabel(distanceM: number): string {

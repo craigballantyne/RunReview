@@ -1,7 +1,8 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.js";
 import { useAuthModal } from "../../context/AuthModalContext.js";
 import { AccountMenu } from "./AccountMenu.js";
+import { NavItem } from "./NavItem.js";
 
 export function NavBar() {
   const { user } = useAuth();
@@ -15,40 +16,9 @@ export function NavBar() {
         </Link>
         {user && (
           <>
-            <NavLink
-              to="/activities"
-              className={({ isActive }: { isActive: boolean }) =>
-                `group relative inline-block py-1 text-sm font-medium transition-colors ${isActive ? "text-purple-700" : "text-gray-500 hover:text-purple-600"}`
-              }
-            >
-              {({ isActive }: { isActive: boolean }) => (
-                <>
-                  Activities
-                  <span
-                    className={`pointer-events-none absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full bg-purple-600 transition-transform duration-200 ease-out ${
-                      isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                    }`}
-                  />
-                </>
-              )}
-            </NavLink>
-            <NavLink
-              to="/route-planner"
-              className={({ isActive }: { isActive: boolean }) =>
-                `group relative inline-block py-1 text-sm font-medium transition-colors ${isActive ? "text-purple-700" : "text-gray-500 hover:text-purple-600"}`
-              }
-            >
-              {({ isActive }: { isActive: boolean }) => (
-                <>
-                  Route planner
-                  <span
-                    className={`pointer-events-none absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full bg-purple-600 transition-transform duration-200 ease-out ${
-                      isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                    }`}
-                  />
-                </>
-              )}
-            </NavLink>
+            <NavItem to="/activities">Activities</NavItem>
+            <NavItem to="/records">Records</NavItem>
+            <NavItem to="/route-planner">Route planner</NavItem>
           </>
         )}
       </div>
