@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, Polyline, Marker, useMap, useMapEvents } from "react-leaflet";
+import { BASEMAP_ATTRIBUTION, BASEMAP_TILE_URL } from "../../lib/basemap.js";
 import L, { type LeafletEvent, type LeafletMouseEvent } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { EDINBURGH_FALLBACK, getCurrentPositionOrFallback, type LatLng } from "../../lib/geolocation.js";
@@ -123,9 +124,21 @@ function RecenterOnUser({ center }: { center: LatLng }) {
   return null;
 }
 
-function ClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number) => void }) {
+function ClickHandler({
+  onMapClick,
+  isSuppressed,
+}: {
+  onMapClick: (lat: number, lng: number) => void;
+  /** Checked at dispatch time rather than passed as a value, so the latest state is always read. */
+  isSuppressed: () => boolean;
+}) {
   useMapEvents({
     click(e) {
+      // Ending a marker drag can emit a map click from the same mouseup. Without this guard that
+      // click appends a point directly under the marker just dropped — nearly invisible on the
+      // map, but a second action on the undo stack, so undoing an edit appeared to take two
+      // presses. Every other handler in this panel already consults the same ref; this one didn't.
+      if (isSuppressed()) return;
       onMapClick(e.latlng.lat, e.latlng.lng);
     },
   });
@@ -259,6 +272,16 @@ export function RoutePlannerMapPanel({ plan }: RoutePlannerMapPanelProps) {
   // its position prop via setLatLng() on that re-render, which fights Leaflet's own native drag
   // tracking and snaps the marker back to its pre-drag position before the user can drop it.
   const isDraggingMarkerRef = useRef(false);
+  /**
+   * Drops the drag guard only after the current event has finished dispatching, so a map click
+   * emitted by the same mouseup that ended the drag is still suppressed. Clearing it synchronously
+   * lets that click through, which is what put a second entry on the undo stack for one edit.
+   */
+  const releaseDragGuard = useCallback(() => {
+    setTimeout(() => {
+      isDraggingMarkerRef.current = false;
+    }, 0);
+  }, []);
   // The "+" marker sits directly on top of the polyline it's hovering over, so once it renders,
   // the polyline itself sees the pointer as having left it (the marker's DOM element is now what
   // the browser hit-tests) and fires mouseout — clearing hoverInsert immediately would unmount
@@ -291,13 +314,16 @@ export function RoutePlannerMapPanel({ plan }: RoutePlannerMapPanelProps) {
     <div className="relative h-full w-full">
       <MapContainer center={[center.lat, center.lng]} zoom={DEFAULT_ZOOM} className="h-full w-full">
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution={BASEMAP_ATTRIBUTION}
+          url={BASEMAP_TILE_URL}
           subdomains="abcd"
           maxZoom={20}
         />
         <RecenterOnUser center={center} />
-        <ClickHandler onMapClick={(lat, lng) => void plan.addPoint(lat, lng)} />
+        <ClickHandler
+          onMapClick={(lat, lng) => void plan.addPoint(lat, lng)}
+          isSuppressed={() => isDraggingMarkerRef.current}
+        />
         {showHeatmap && heatmapData && <HeatmapLayer points={heatmapData.points} />}
         {plan.routeGeometry.length > 1 && (
           <Polyline
@@ -343,9 +369,9 @@ export function RoutePlannerMapPanel({ plan }: RoutePlannerMapPanelProps) {
               setDragPreview({ lat, lng, before: plan.points[i - 1] ?? null, after: plan.points[i + 1] ?? null });
             }}
             onMoveEnd={(lat, lng) => {
-              isDraggingMarkerRef.current = false;
               setDragPreview(null);
               void plan.movePoint(i, lat, lng);
+              releaseDragGuard();
             }}
           />
         ))}
@@ -376,10 +402,10 @@ export function RoutePlannerMapPanel({ plan }: RoutePlannerMapPanelProps) {
             }}
             onCommit={(insertIndex, lat, lng) => {
               cancelHoverClear();
-              isDraggingMarkerRef.current = false;
               setHoverInsert(null);
               setDragPreview(null);
               void plan.insertPoint(insertIndex, lat, lng);
+              releaseDragGuard();
             }}
           />
         )}

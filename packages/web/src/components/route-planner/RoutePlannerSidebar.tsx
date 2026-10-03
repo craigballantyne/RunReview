@@ -17,7 +17,7 @@ function formatMeters(value: number): string {
 
 export function RoutePlannerSidebar({ plan }: RoutePlannerSidebarProps) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const { points, startLocation, stats, elevationProfile, undo, completeLoop, clear } = plan;
+  const { points, startLocation, stats, elevationProfile, canUndo, undo, completeLoop, clear } = plan;
 
   if (points.length === 0) {
     return (
@@ -61,8 +61,8 @@ export function RoutePlannerSidebar({ plan }: RoutePlannerSidebarProps) {
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
-            onClick={() => void undo()}
-            disabled={!hasMultiplePoints}
+            onClick={undo}
+            disabled={!canUndo}
             className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
           >
             Undo

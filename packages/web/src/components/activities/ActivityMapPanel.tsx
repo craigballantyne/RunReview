@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, Polyline, CircleMarker, Marker, useMap } from "react-leaflet";
+import { BASEMAP_ATTRIBUTION, BASEMAP_TILE_URL } from "../../lib/basemap.js";
 import L from "leaflet";
 import type { LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -131,8 +132,8 @@ export function ActivityMapPanel({ selectedRunId }: ActivityMapPanelProps) {
     <div className="relative h-full w-full">
       <MapContainer center={[center.lat, center.lng]} zoom={DEFAULT_ZOOM} className="h-full w-full">
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution={BASEMAP_ATTRIBUTION}
+          url={BASEMAP_TILE_URL}
           subdomains="abcd"
           maxZoom={20}
         />
